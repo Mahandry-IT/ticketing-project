@@ -254,8 +254,8 @@ INSERT INTO model (name, manufacturer, capacity) VALUES
 
 -- Insert sample admin user (password: admin123)
 INSERT INTO appuser (email, pwd, username, first_name, last_name, id_role) VALUES 
-('admin@ticketing.com', '$2a$12$3v97Vgiax.uDER3Nfyqxa.EIVvoQP37XVxyKUsASZf4Y/xpZknEdi', 'admin', 'Admin', 'User', 1);
+('admin@ticketing.com', 'admin123', 'admin', 'Admin', 'User', 1);
 
 -- Insert sample regular user (password: user123)
 INSERT INTO appuser (email, pwd, username, first_name, last_name, id_role) VALUES 
-('user@ticketing.com', '$2a$12$8V6gwItDomOZlzOgZtYDrOeh.10xk2C8qrv8VkZUF2ZYxEqiESGJS', 'user', 'Regular', 'User', 2);
+('user@ticketing.com', 'user123', 'user', 'Regular', 'User', 2);

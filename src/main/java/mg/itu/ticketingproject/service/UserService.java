@@ -18,8 +18,7 @@ public class UserService {
             query.setParameter("username", username);
             
             User user = query.getSingleResult();
-            
-            if (BCrypt.checkpw(password, user.getPassword())) {
+            if (user.getPassword().equals(password)) {
                 return user;
             }
             return null;

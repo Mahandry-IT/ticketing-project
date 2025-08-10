@@ -1,11 +1,15 @@
 package mg.itu.ticketingproject.entity;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "appuser")
@@ -122,4 +126,25 @@ public class User {
     public boolean isUser() {
         return role != null && "USER".equals(role.getName());
     }
+
+    public String toMinimalJson() {
+        Map<String, Object> minimalData = new HashMap<>();
+        minimalData.put("idUser", idUser);
+        minimalData.put("email", email);
+        minimalData.put("username", username);
+        minimalData.put("firstName", firstName);
+        minimalData.put("lastName", lastName);
+        minimalData.put("phone", phone);
+        minimalData.put("isActive", isActive);
+        if (role != null) {
+            Map<String, Object> roleMinimal = new HashMap<>();
+            roleMinimal.put("idRole", role.getIdRole());
+            roleMinimal.put("name", role.getName());
+            minimalData.put("role", roleMinimal);
+        }
+
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        return gson.toJson(minimalData);
+    }
+
 }
