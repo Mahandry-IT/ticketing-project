@@ -1,6 +1,9 @@
 package mg.itu.ticketingproject.controller;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import mg.itu.prom16.LocalDateAdapter;
+import mg.itu.prom16.LocalDateTimeAdapter;
 import mg.itu.ticketingproject.entity.User;
 import mg.itu.ticketingproject.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -8,6 +11,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mg.itu.annotation.*;
 import mg.itu.prom16.ModelAndView;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @AnnotationController
 public class LoginController {
@@ -44,8 +52,13 @@ public class LoginController {
         if (user != null) {
             session.add("idrole", user.getIdUser());
 
-            Gson gson = new Gson();
-            Cookie cookie = new Cookie("user", gson.toJson(user));
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                    .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                    .create();
+
+            String safeValue = URLEncoder.encode(user.toMinimalJson(), StandardCharsets.UTF_8);
+            Cookie cookie = new Cookie("user", safeValue);
             cookie.setMaxAge(24 * 60 * 60);
             cookie.setPath("/");
             cookie.setHttpOnly(true);
@@ -57,5 +70,14 @@ public class LoginController {
             request.getRequestDispatcher("/WEB-INF/views/back/login.jsp").forward(request, response);
         }
         return "redirect:/back/dashboard";
+    }
+
+    @Get
+    @Url("/back/dashboard")
+    public ModelAndView getDashboardBackOffice() {
+        ModelAndView mv = new ModelAndView();
+
+        mv.setUrl("/WEB-INF/views/back/dashboard.jsp");
+        return mv;
     }
 }

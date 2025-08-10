@@ -120,6 +120,7 @@ body {
     background: #333;
     color: white;
     padding: 1rem 0;
+    height: 60px;
 }
 
 .navbar .container {
