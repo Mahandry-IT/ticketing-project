@@ -1,0 +1,561 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.interface-selection {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    width: 100%;
+    max-width: 800px;
+}
+
+.interface-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.interface-card:hover {
+    transform: translateY(-5px);
+}
+
+.interface-card h2 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.interface-card p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 30px;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, #f093fb, #f5576c);
+    color: white;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+}
+
+.footer {
+    text-align: center;
+    color: white;
+    margin-top: 40px;
+    opacity: 0.8;
+}
+
+/* Styles pour les pages internes */
+.page-container {
+    background: white;
+    min-height: 100vh;
+}
+
+.navbar {
+    background: #333;
+    color: white;
+    padding: 1rem 0;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.navbar h1 {
+    font-size: 1.5rem;
+}
+
+.navbar nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    padding: 8px 16px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.navbar nav a:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-form {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.content {
+    padding: 30px 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table th,
+.table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.table th {
+    background: #f8f9fa;
+    font-weight: bold;
+}
+
+.table tr:hover {
+    background: #f8f9fa;
+}
+
+.search-filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    margin: 2px;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-warning {
+    background: #ffc107;
+    color: #333;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #999;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.stat-card h3 {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+@media (max-width: 768px) {
+    .interface-selection {
+        grid-template-columns: 1fr;
+    }
+
+    .search-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .navbar .container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .table {
+        font-size: 0.9rem;
+    }
+}
+
+/* Styles pour la page d'erreur */
+.error-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 40px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.error-header {
+    margin-bottom: 30px;
+}
+
+.error-code {
+    font-size: 6rem;
+    font-weight: bold;
+    color: #dc3545;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(220, 53, 69, 0.2);
+}
+
+.error-title {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.error-message {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #dc3545;
+}
+
+.stack-trace {
+    background: #2d3748;
+    color: #e2e8f0;
+    padding: 20px;
+    border-radius: 8px;
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+    text-align: left;
+    margin: 20px 0;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #4a5568;
+}
+
+.stack-trace::-webkit-scrollbar {
+    width: 8px;
+}
+
+.stack-trace::-webkit-scrollbar-track {
+    background: #4a5568;
+    border-radius: 4px;
+}
+
+.stack-trace::-webkit-scrollbar-thumb {
+    background: #718096;
+    border-radius: 4px;
+}
+
+.stack-trace::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+.error-actions {
+    margin-top: 30px;
+}
+
+.error-actions .btn {
+    margin: 0 10px;
+}
+
+/* Animation pour la page d'erreur */
+.error-container {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.error-code {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Styles responsives pour la page d'erreur */
+@media (max-width: 768px) {
+    .error-container {
+        margin: 20px;
+        padding: 30px 20px;
+    }
+
+    .error-code {
+        font-size: 4rem;
+    }
+
+    .error-title {
+        font-size: 1.5rem;
+    }
+
+    .error-message {
+        font-size: 1rem;
+        padding: 15px;
+    }
+
+    .stack-trace {
+        font-size: 0.8rem;
+        padding: 15px;
+        max-height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .error-code {
+        font-size: 3rem;
+    }
+
+    .error-title {
+        font-size: 1.3rem;
+    }
+
+    .error-actions .btn {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+    }
+}
+
+/* Variantes de couleurs pour différents types d'erreurs */
+.error-container.error-404 .error-code {
+    color: #ffc107;
+}
+
+.error-container.error-404 .error-message {
+    border-left-color: #ffc107;
+}
+
+.error-container.error-403 .error-code {
+    color: #fd7e14;
+}
+
+.error-container.error-403 .error-message {
+    border-left-color: #fd7e14;
+}
+
+.error-container.error-500 .error-code {
+    color: #dc3545;
+}
+
+.error-container.error-500 .error-message {
+    border-left-color: #dc3545;
+}
+
+/* Style pour les liens dans les messages d'erreur */
+.error-message a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.error-message a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* Icône d'erreur optionnelle */
+.error-icon {
+    font-size: 4rem;
+    color: #dc3545;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.error-container.error-404 .error-icon {
+    color: #ffc107;
+}
+
+.error-container.error-403 .error-icon {
+    color: #fd7e14;
+}
