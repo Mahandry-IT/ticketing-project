@@ -7,6 +7,10 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "reservation")
@@ -24,11 +28,6 @@ public class Reservation {
     @Column(name = "total_price", nullable = false, precision = 15, scale = 2)
     private BigDecimal totalPrice;
 
-    @Size(max = 50)
-    @NotNull
-    @Column(name = "status", nullable = false, length = 50)
-    private String status;
-
     @NotNull
     @Column(name = "passenger_count", nullable = false)
     private Integer passengerCount;
@@ -42,4 +41,7 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_flight", nullable = false)
     private Flight flight;
+
+    @OneToMany(mappedBy = "reservation")
+    private List<ReservationDetail> reservationDetails = new ArrayList<>();
 }

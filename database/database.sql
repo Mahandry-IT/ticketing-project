@@ -201,3 +201,21 @@ INSERT INTO appuser (email, pwd, username, id_role) VALUES
 -- Insert sample regular user (password: user123)
 INSERT INTO appuser (email, pwd, username, id_role) VALUES
 ('user@ticketing.com', 'user123', 'user', 2);
+
+
+
+
+
+
+
+
+-- Supprimer la colonne status de reservation
+ALTER TABLE reservation DROP COLUMN status;
+
+-- Ajouter la colonne status dans reservation_details
+ALTER TABLE reservation_details ADD COLUMN status VARCHAR(50) NOT NULL DEFAULT 'CONFIRMED';
+
+-- Ajouter la contrainte de vérification sur la nouvelle colonne
+ALTER TABLE reservation_details
+    ADD CONSTRAINT chk_status_details
+        CHECK (status IN ('CONFIRMED', 'CANCELED', 'PENDING'));
