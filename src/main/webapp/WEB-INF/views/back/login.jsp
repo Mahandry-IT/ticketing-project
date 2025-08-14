@@ -1,4 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    String error = (String) request.getAttribute("error");
+%>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -15,9 +18,13 @@
         </header>
         
         <main class="main-content">
-            <form class="form-container" action="${pageContext.request.contextPath}/back/dashboard" method="get">
+            <form class="form-container" action="${pageContext.request.contextPath}/back/login" method="post">
                 <h2 class="text-center mb-4">Connexion Administrateur</h2>
-                
+                <% if(error != null && !error.isEmpty()) { %>
+                    <div class="alert alert-danger mb-3">
+                        <%= error %>
+                    </div>
+                <% } %>
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" class="form-control" required 

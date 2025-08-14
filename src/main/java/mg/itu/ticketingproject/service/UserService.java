@@ -2,22 +2,27 @@ package mg.itu.ticketingproject.service;
 
 import data.request.LoginRequest;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.NoResultException;
 import mg.itu.ticketingproject.entity.Appuser;
 import mg.itu.ticketingproject.util.JPAUtil;
 
+import java.util.Optional;
+
 public class UserService {
 
-    public Appuser findUserByCreditential(LoginRequest request) {
+    public Optional<Appuser> findUserByCreditential(LoginRequest loginRequest) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            TypedQuery<Appuser> query = em.createQuery(
-                "SELECT u FROM Appuser u WHERE u.username = : AND u.pwd = :password",
-                    Appuser.class);
-            return query.getSingleResult();
-        } finally {
-            em.close();
+            Appuser user = em.createQuery(
+                            "SELECT u FROM Appuser u WHERE u.email = :email AND u.pwd = :password", Appuser.class)
+                    .setParameter("email", loginRequest.getEmail())
+                    .setParameter("password", loginRequest.getPassword())
+                    .getSingleResult();
+            return Optional.of(user);
+        } catch (NoResultException e) {
+            return Optional.empty();
         }
     }
+
 
 }

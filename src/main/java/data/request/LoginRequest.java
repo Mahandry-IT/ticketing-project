@@ -1,9 +1,15 @@
 package data.request;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+import mg.itu.annotation.FormParametre;
 
 @Data
 public class LoginRequest {
-    private String username;
+    @NotEmpty
+    @FormParametre("email")
+    private String email;
+    @NotEmpty
+    @FormParametre("password")
     private String password;
 }
