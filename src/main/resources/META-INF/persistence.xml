@@ -9,21 +9,7 @@
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
     <!-- Entity Classes -->
-    <class>mg.itu.ticketingproject.entity.User</class>
-    <class>mg.itu.ticketingproject.entity.Role</class>
-    <class>mg.itu.ticketingproject.entity.City</class>
-    <class>mg.itu.ticketingproject.entity.Model</class>
-    <class>mg.itu.ticketingproject.entity.Plane</class>
-    <class>mg.itu.ticketingproject.entity.SeatType</class>
-    <class>mg.itu.ticketingproject.entity.PlaneSeat</class>
-    <class>mg.itu.ticketingproject.entity.Flight</class>
-    <class>mg.itu.ticketingproject.entity.SeatPrice</class>
-    <class>mg.itu.ticketingproject.entity.Offer</class>
-    <class>mg.itu.ticketingproject.entity.Reservation</class>
-    <class>mg.itu.ticketingproject.entity.ReservationDetails</class>
-    <class>mg.itu.ticketingproject.entity.AgeCategory</class>
-    <class>mg.itu.ticketingproject.entity.AgeOffer</class>
-    <class>mg.itu.ticketingproject.entity.ReservationParam</class>
+    <!--<class>mg.itu.ticketingproject.entity.User</class>-->
 
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
