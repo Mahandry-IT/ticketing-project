@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Data
 public class Offer {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_offer", nullable = false)
     private Integer id;
 

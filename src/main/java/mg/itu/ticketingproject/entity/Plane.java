@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Data
 public class Plane {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_plane", nullable = false)
     private Integer id;
 

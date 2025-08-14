@@ -1,9 +1,6 @@
 package mg.itu.ticketingproject.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -12,6 +9,7 @@ import lombok.Data;
 @Data
 public class ReservationParam {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_parameter", nullable = false)
     private Integer id;
 

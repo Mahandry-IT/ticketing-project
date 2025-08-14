@@ -1,4 +1,4 @@
-package data.request;
+package mg.itu.ticketingproject.data.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;

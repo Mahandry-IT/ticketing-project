@@ -202,12 +202,13 @@ INSERT INTO appuser (email, pwd, username, id_role) VALUES
 INSERT INTO appuser (email, pwd, username, id_role) VALUES
 ('user@ticketing.com', 'user123', 'user', 2);
 
-
-
-
-
-
-
+-- Sample data for the 'plane' table
+INSERT INTO plane (name, manufacturing_date, id_model) VALUES
+('EagleJet 101', '2014-05-20', 1),  -- Boeing 737-800
+('SkyCruiser A1', '2016-09-15', 2), -- Airbus A320
+('TitanAir 777', '2019-12-03', 3),  -- Boeing 777-300ER
+('JetStream 737', '2015-07-11', 1), -- Boeing 737-800
+('NovaAir A320', '2021-03-22', 2);  -- Airbus A320
 
 -- Supprimer la colonne status de reservation
 ALTER TABLE reservation DROP COLUMN status;

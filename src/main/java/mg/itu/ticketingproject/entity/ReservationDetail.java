@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @Data
 public class ReservationDetail {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_details", nullable = false)
     private Integer id;
 

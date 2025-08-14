@@ -1,6 +1,6 @@
 package mg.itu.ticketingproject.controller;
 
-import data.request.LoginRequest;
+import mg.itu.ticketingproject.data.request.LoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

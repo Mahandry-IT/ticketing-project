@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Data
 public class PlaneSeat {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_price", nullable = false)
     private Integer id;
 

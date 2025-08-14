@@ -1,4 +1,11 @@
+<%@ page import="java.util.List" %>
+<%@ page import="mg.itu.ticketingproject.entity.Flight" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%
+    List<Flight> flights = (List<Flight>) request.getAttribute("flights");
+
+%>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -14,7 +21,7 @@
         <main class="main-content">
             <div class="content-header">
                 <h2>Gestion des Vols</h2>
-                <a href="${pageContext.request.contextPath}/WEB-INF/views/back/flight-add.jsp" class="btn btn-primary">+ Nouveau Vol</a>
+                <a href="${pageContext.request.contextPath}/back/add/flight" class="btn btn-primary">+ Nouveau Vol</a>
             </div>
             
             <!-- Filtres de recherche -->
@@ -81,46 +88,37 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <%
+                            if (flights == null || flights.isEmpty()) {
+                        %>
                         <tr>
-                            <td>001</td>
-                            <td>Paris</td>
-                            <td>London</td>
-                            <td>2024-01-15 08:00</td>
-                            <td>2024-01-15 09:30</td>
-                            <td>Boeing 737-800</td>
+                            <td colspan="7" style="text-align:center; font-style:italic;">
+                                Aucun vol trouvé
+                            </td>
+                        </tr>
+                        <%
+                        } else {
+                            for (Flight f : flights) {
+                        %>
+                        <tr>
+                            <td><%= f.getId() %></td>
+                            <td><%= f.getDepartureCity().getName() %></td>
+                            <td><%= f.getArrivalCity().getName() %></td>
+                            <td><%= f.getDepartureTime() %></td>
+                            <td><%= f.getArrivalTime() %></td>
+                            <td><%= f.getPlane().getName() %></td>
                             <td class="actions">
-                                <a href="${pageContext.request.contextPath}/WEB-INF/views/back/flight-details.jsp?id=1" class="btn btn-secondary">Détails</a>
-                                <a href="${pageContext.request.contextPath}/WEB-INF/views/back/flight-edit.jsp?id=1" class="btn btn-warning">Modifier</a>
+                                <a href="${pageContext.request.contextPath}/flight/details?id=<%= f.getId() %>" class="btn btn-secondary">Détails</a>
+                                <a href="${pageContext.request.contextPath}/flight/edit?id=<%= f.getId() %>" class="btn btn-warning">Modifier</a>
                                 <button class="btn btn-danger">Supprimer</button>
                             </td>
                         </tr>
-                        <tr>
-                            <td>002</td>
-                            <td>London</td>
-                            <td>New York</td>
-                            <td>2024-01-15 14:00</td>
-                            <td>2024-01-15 17:00</td>
-                            <td>Boeing 777-300ER</td>
-                            <td class="actions">
-                                <a href="${pageContext.request.contextPath}/WEB-INF/views/back/flight-details.jsp?id=2" class="btn btn-secondary">Détails</a>
-                                <a href="${pageContext.request.contextPath}/WEB-INF/views/back/flight-edit.jsp?id=2" class="btn btn-warning">Modifier</a>
-                                <button class="btn btn-danger">Supprimer</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>003</td>
-                            <td>Tokyo</td>
-                            <td>Dubai</td>
-                            <td>2024-01-16 22:00</td>
-                            <td>2024-01-17 04:30</td>
-                            <td>Airbus A320</td>
-                            <td class="actions">
-                                <a href="${pageContext.request.contextPath}/WEB-INF/views/back/flight-details.jsp?id=3" class="btn btn-secondary">Détails</a>
-                                <a href="${pageContext.request.contextPath}/WEB-INF/views/back/flight-edit.jsp?id=3" class="btn btn-warning">Modifier</a>
-                                <button class="btn btn-danger">Supprimer</button>
-                            </td>
-                        </tr>
+                        <%
+                                }
+                            }
+                        %>
                     </tbody>
+
                 </table>
             </div>
         </main>
