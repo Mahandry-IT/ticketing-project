@@ -3,11 +3,13 @@ package mg.itu.ticketingproject.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "reservation_details")
+@Data
 public class ReservationDetail {
     @Id
     @Column(name = "id_details", nullable = false)
@@ -33,67 +35,10 @@ public class ReservationDetail {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_reservation", nullable = false)
-    private Reservation idReservation;
+    private Reservation reservation;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_type", nullable = false)
-    private SeatType idType;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getPassengerName() {
-        return passengerName;
-    }
-
-    public void setPassengerName(String passengerName) {
-        this.passengerName = passengerName;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public String getPassport() {
-        return passport;
-    }
-
-    public void setPassport(String passport) {
-        this.passport = passport;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Reservation getIdReservation() {
-        return idReservation;
-    }
-
-    public void setIdReservation(Reservation idReservation) {
-        this.idReservation = idReservation;
-    }
-
-    public SeatType getIdType() {
-        return idType;
-    }
-
-    public void setIdType(SeatType idType) {
-        this.idType = idType;
-    }
-
+    private SeatType seatType;
 }
