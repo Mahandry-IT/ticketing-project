@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reservation")
@@ -18,7 +18,7 @@ public class Reservation {
 
     @NotNull
     @Column(name = "reservation_time", nullable = false)
-    private Instant reservationTime;
+    private LocalDateTime reservationTime;
 
     @NotNull
     @Column(name = "total_price", nullable = false, precision = 15, scale = 2)

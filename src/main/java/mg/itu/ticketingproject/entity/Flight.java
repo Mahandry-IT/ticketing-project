@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -16,11 +16,11 @@ public class Flight {
 
     @NotNull
     @Column(name = "departure_time", nullable = false)
-    private Instant departureTime;
+    private LocalDateTime departureTime;
 
     @NotNull
     @Column(name = "arrival_time", nullable = false)
-    private Instant arrivalTime;
+    private LocalDateTime arrivalTime;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -53,7 +53,7 @@ public class FlightService {
         EntityManager em = JPAUtil.getEntityManager();
         try {
             StringBuilder jpql = new StringBuilder(
-                "SELECT f FROM Flight f JOIN FETCH f.departureCity dc JOIN FETCH f.arrivalCity ac JOIN FETCH f.plane WHERE 1=1");
+                    "SELECT f FROM Flight f JOIN FETCH f.departureCity dc JOIN FETCH f.arrivalCity ac JOIN FETCH f.plane WHERE 1=1");
 
             if (departureCity != null && !departureCity.trim().isEmpty()) {
                 jpql.append(" AND LOWER(dc.name) LIKE LOWER(:departureCity)");
