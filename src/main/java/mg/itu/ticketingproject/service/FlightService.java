@@ -1,13 +1,4 @@
 package mg.itu.ticketingproject.service;
-//
-//import mg.itu.ticketingproject.entity.City;
-//import mg.itu.ticketingproject.entity.Flight;
-//import mg.itu.ticketingproject.util.JPAUtil;
-//import jakarta.persistence.EntityManager;
-//import jakarta.persistence.TypedQuery;
-//
-//import java.time.LocalDateTime;
-//import java.util.List;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -48,7 +39,7 @@ public class FlightService {
         EntityManager em = JPAUtil.getEntityManager();
         try {
             return em.createQuery(
-                "SELECT f FROM Flight f JOIN FETCH f.departureCity JOIN FETCH f.arrivalCity JOIN FETCH f.plane WHERE f.idFlight = :id",
+                "SELECT f FROM Flight f JOIN FETCH f.departureCity JOIN FETCH f.arrivalCity JOIN FETCH f.plane WHERE f.id = :id",
                 Flight.class)
                 .setParameter("id", id)
                 .getSingleResult();
