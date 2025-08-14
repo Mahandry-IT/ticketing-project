@@ -12,7 +12,7 @@ public class UserService {
         EntityManager em = JPAUtil.getEntityManager();
         try {
             TypedQuery<Appuser> query = em.createQuery(
-                "SELECT u FROM Appuser u WHERE u.username = :username AND u.pwd = :password",
+                "SELECT u FROM Appuser u WHERE u.username = : AND u.pwd = :password",
                     Appuser.class);
             return query.getSingleResult();
         } finally {

@@ -6,9 +6,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 @Entity
 @Table(name = "age_category")
+@Data
 public class AgeCategory {
     @Id
     @Column(name = "id_category", nullable = false)
@@ -26,37 +28,4 @@ public class AgeCategory {
     @NotNull
     @Column(name = "name", nullable = false)
     private String name;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getMinimal() {
-        return minimal;
-    }
-
-    public void setMinimal(Integer minimal) {
-        this.minimal = minimal;
-    }
-
-    public Integer getMaximal() {
-        return maximal;
-    }
-
-    public void setMaximal(Integer maximal) {
-        this.maximal = maximal;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
 }

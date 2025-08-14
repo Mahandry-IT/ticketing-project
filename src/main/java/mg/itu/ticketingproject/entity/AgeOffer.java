@@ -2,10 +2,12 @@ package mg.itu.ticketingproject.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Entity
+@Data
 @Table(name = "age_offer")
 public class AgeOffer {
     @Id
@@ -19,30 +21,6 @@ public class AgeOffer {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_category", nullable = false)
-    private AgeCategory idCategory;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public BigDecimal getOffer() {
-        return offer;
-    }
-
-    public void setOffer(BigDecimal offer) {
-        this.offer = offer;
-    }
-
-    public AgeCategory getIdCategory() {
-        return idCategory;
-    }
-
-    public void setIdCategory(AgeCategory idCategory) {
-        this.idCategory = idCategory;
-    }
+    private AgeCategory category;
 
 }

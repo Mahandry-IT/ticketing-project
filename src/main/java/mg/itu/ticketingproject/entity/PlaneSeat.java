@@ -2,11 +2,13 @@ package mg.itu.ticketingproject.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "plane_seat")
+@Data
 public class PlaneSeat {
     @Id
     @Column(name = "id_price", nullable = false)
@@ -23,51 +25,11 @@ public class PlaneSeat {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_flight", nullable = false)
-    private Flight idFlight;
+    private Flight flight;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_type", nullable = false)
-    private SeatType idType;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Flight getIdFlight() {
-        return idFlight;
-    }
-
-    public void setIdFlight(Flight idFlight) {
-        this.idFlight = idFlight;
-    }
-
-    public SeatType getIdType() {
-        return idType;
-    }
-
-    public void setIdType(SeatType idType) {
-        this.idType = idType;
-    }
+    private SeatType type;
 
 }

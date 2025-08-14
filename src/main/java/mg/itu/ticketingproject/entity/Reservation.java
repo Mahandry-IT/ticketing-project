@@ -3,12 +3,14 @@ package mg.itu.ticketingproject.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
 @Table(name = "reservation")
+@Data
 public class Reservation {
     @Id
     @Column(name = "id_reservation", nullable = false)
@@ -34,67 +36,10 @@ public class Reservation {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_user", nullable = false)
-    private Appuser idUser;
+    private Appuser user;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_flight", nullable = false)
-    private Flight idFlight;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Instant getReservationTime() {
-        return reservationTime;
-    }
-
-    public void setReservationTime(Instant reservationTime) {
-        this.reservationTime = reservationTime;
-    }
-
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Integer getPassengerCount() {
-        return passengerCount;
-    }
-
-    public void setPassengerCount(Integer passengerCount) {
-        this.passengerCount = passengerCount;
-    }
-
-    public Appuser getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(Appuser idUser) {
-        this.idUser = idUser;
-    }
-
-    public Flight getIdFlight() {
-        return idFlight;
-    }
-
-    public void setIdFlight(Flight idFlight) {
-        this.idFlight = idFlight;
-    }
-
+    private Flight flight;
 }
