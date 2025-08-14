@@ -1,14 +1,20 @@
 package mg.itu.ticketingproject.service;
 
+import data.request.LoginRequest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import mg.itu.ticketingproject.entity.Appuser;
+import mg.itu.ticketingproject.util.JPAUtil;
+
 public class UserService {
 
-    public List<Flight> findAll() {
+    public Appuser findUserByCreditential(LoginRequest request) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            TypedQuery<Flight> query = em.createQuery(
-                "SELECT f FROM Flight f JOIN FETCH f.departureCity JOIN FETCH f.arrivalCity JOIN FETCH f.plane ORDER BY f.departureTime",
-                Flight.class);
-            return query.getResultList();
+            TypedQuery<Appuser> query = em.createQuery(
+                "SELECT u FROM Appuser u WHERE u.username = :username AND u.password = :password",
+                    Appuser.class);
+            return query.getSingleResult();
         } finally {
             em.close();
         }
