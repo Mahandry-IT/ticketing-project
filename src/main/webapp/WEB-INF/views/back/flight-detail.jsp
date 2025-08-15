@@ -1,15 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
-<%@ page import="mg.itu.ticketingproject.entity.City" %>
-<%@ page import="mg.itu.ticketingproject.entity.Plane" %>
-<%@ page import="mg.itu.ticketingproject.entity.SeatType" %>
 <%@ page import="mg.itu.ticketingproject.util.FrontUtil" %>
+<%@ page import="java.util.Objects" %>
+<%@ page import="mg.itu.ticketingproject.entity.*" %>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nouveau Vol - Backoffice</title>
+    <title>Detail Vol - Backoffice</title>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css">
 </head>
 <body>
@@ -18,7 +17,7 @@
 <div class="container">
     <main class="main-content">
         <div class="content-header">
-            <h2>Créer un Nouveau Vol</h2>
+            <h2>Détail d'un Vol</h2>
             <a href="<%= request.getContextPath() %>/back/flights" class="btn btn-secondary">← Retour à la liste</a>
         </div>
 
@@ -26,9 +25,11 @@
             List<City> cities = (List<City>) request.getAttribute("cities");
             List<Plane> planes = (List<Plane>) request.getAttribute("planes");
             List<SeatType> types = (List<SeatType>) request.getAttribute("seats");
+            Flight flight = (Flight) request.getAttribute("flight");
+            List<PlaneSeat> planeSeat = (List<PlaneSeat>) request.getAttribute("planeSeats");
         %>
 
-        <form class="form-container" style="max-width: 800px;" action="<%= request.getContextPath() %>/back/add/flight" method="post">
+        <form class="form-container" style="max-width: 800px;">
             <div class="form-row">
                 <div class="form-group">
                     <label for="departure_city">Ville de départ *</label>
@@ -38,7 +39,11 @@
                             if (cities != null) {
                                 for (City city : cities) {
                         %>
-                        <option value="<%= city.getId() %>"><%= city.getName() %></option>
+                        <% if (Objects.equals(city.getId(), flight.getDepartureCity().getId())) {%>
+                            <option value="<%= city.getId() %>" selected><%= city.getName() %></option>
+                        <% } else {%>
+                            <option value="<%= city.getId() %>"><%= city.getName() %></option>
+                        <% } %>
                         <%
                                 }
                             }
@@ -54,7 +59,11 @@
                             if (cities != null) {
                                 for (City city : cities) {
                         %>
+                        <% if (Objects.equals(city.getId(), flight.getArrivalCity().getId())) {%>
+                        <option value="<%= city.getId() %>" selected><%= city.getName() %></option>
+                        <% } else {%>
                         <option value="<%= city.getId() %>"><%= city.getName() %></option>
+                        <% } %>
                         <%
                                 }
                             }
@@ -66,11 +75,11 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="departure_date">Temps de départ *</label>
-                    <input type="datetime-local" id="departure_date" name="departure_date" class="form-control" required>
+                    <input type="datetime-local" id="departure_date" name="departure_date" class="form-control"  value="<%= flight.getDepartureTime()%>" required>
                 </div>
                 <div class="form-group">
                     <label for="arrival_date">Temps d'arrivée *</label>
-                    <input type="datetime-local" id="arrival_date" name="arrival_date" class="form-control" required>
+                    <input type="datetime-local" id="arrival_date" name="arrival_date" class="form-control" value="<%= flight.getArrivalTime()%>" required>
                 </div>
             </div>
 
@@ -82,9 +91,15 @@
                         if (planes != null) {
                             for (Plane plane : planes) {
                     %>
-                    <option value="<%= plane.getId() %>">
-                        <%= plane.getName() %> - <%= plane.getModel().getName() %>
-                    </option>
+                    <% if (Objects.equals(plane.getId(), flight.getPlane().getId())) {%>
+                        <option value="<%= plane.getId() %>" selected>
+                            <%= plane.getName() %> - <%= plane.getModel().getName() %>
+                        </option>
+                    <% } else {%>
+                        <option value="<%= plane.getId() %>">
+                            <%= plane.getName() %> - <%= plane.getModel().getName() %>
+                        </option>
+                    <% } %>
                     <%
                             }
                         }
@@ -95,29 +110,23 @@
             <h3 class="mt-4 mb-3">Configuration des Sièges et Prix</h3>
                 <%
                     if (types != null) {
-                        for (int i = 0; i < types.size(); i++) {
+                        for (int i = 0; i < planeSeat.size(); i++) {
                 %>
                 <div class="form-row">
-                    <input type="hidden" id="seat_id" name="seat_id" class="form-control"  value="<%= types.get(i).getId() %>" required>
                     <div class="form-group">
                         <label for="seat_count">Nombre de siège <%= FrontUtil.uniformalizedLetter(types.get(i).getName()) %></label>
-                        <input type="number" id="seat_count" name="seat_count" class="form-control" min="0" value="0" required>
+                        <input type="number" id="seat_count" name="seat_count" class="form-control" min="0" value="<%= planeSeat.get(i).getQuantity()%>" required>
                     </div>
 
                     <div class="form-group">
                         <label for="seat_price">Prix <%= FrontUtil.uniformalizedLetter(types.get(i).getName()) %></label>
-                        <input type="number" id="seat_price" name="seat_price" class="form-control" min="0" step="0.01" value="0" required>
+                        <input type="number" id="seat_price" name="seat_price" class="form-control" min="0" step="0.01" value="<%= planeSeat.get(i).getPrice()%>" required>
                     </div>
                 </div>
                 <%
                         }
                     }
                 %>
-
-            <div class="form-group mt-4">
-                <button type="submit" class="btn btn-success">Créer le Vol</button>
-                <a href="<%= request.getContextPath() %>/back/flights" class="btn btn-secondary">Annuler</a>
-            </div>
         </form>
     </main>
 </div>

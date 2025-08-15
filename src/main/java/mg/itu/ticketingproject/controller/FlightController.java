@@ -4,15 +4,10 @@ import jakarta.validation.Valid;
 import lombok.Setter;
 import mg.itu.annotation.*;
 import mg.itu.prom16.ModelAndView;
+import mg.itu.ticketingproject.data.request.FlightMultiSearchRequest;
 import mg.itu.ticketingproject.data.request.FlightRequest;
-import mg.itu.ticketingproject.entity.City;
-import mg.itu.ticketingproject.entity.Flight;
-import mg.itu.ticketingproject.entity.Plane;
-import mg.itu.ticketingproject.entity.SeatType;
-import mg.itu.ticketingproject.service.CityService;
-import mg.itu.ticketingproject.service.FlightService;
-import mg.itu.ticketingproject.service.PlaneService;
-import mg.itu.ticketingproject.service.SeatTypeService;
+import mg.itu.ticketingproject.entity.*;
+import mg.itu.ticketingproject.service.*;
 
 import java.util.List;
 
@@ -24,6 +19,7 @@ public class FlightController {
     private static final PlaneService planeService = new PlaneService();
     private static final CityService cityService = new CityService();
     private static final SeatTypeService seatTypeService = new SeatTypeService();
+    private static final PlaneSeatService planeSeatService = new PlaneSeatService();
     private ModelAndView mv;
 
     @Get
@@ -42,6 +38,7 @@ public class FlightController {
         mv = new ModelAndView();
         List<Flight> flights = service.findAll();
         mv.addObject("flights", flights);
+        loadData(mv);
         mv.setUrl("/WEB-INF/views/back/flights.jsp");
         return mv;
     }
@@ -56,13 +53,70 @@ public class FlightController {
         return mv;
     }
 
+    @Get
+    @Url("/back/modify/flight")
+    @Authenticated(roles = {1})
+    public ModelAndView getFlightsModifyingFormBackOffice(@Parametre(name = "id") Integer id) {
+        Flight flight = service.findById(id);
+        List<PlaneSeat> planeSeats = planeSeatService.findByIdFlight(id);
+        mv = new ModelAndView();
+        loadData(mv);
+        mv.addObject("flight", flight);
+        mv.addObject("planeSeats", planeSeats);
+        mv.setUrl("/WEB-INF/views/back/flight-modify.jsp");
+        return mv;
+    }
+
+    @Get
+    @Url("/back/delete/flight")
+    @Authenticated(roles = {1})
+    public String deleteFlight(@Parametre(name = "id") Integer id) {
+        service.delete(id);
+        return "redirect:/back/flights";
+    }
+
+    @Get
+    @Url("/back/detail/flight")
+    @Authenticated(roles = {1})
+    public ModelAndView getFlightsDetailingFormBackOffice(@Parametre(name = "id") Integer id) {
+        Flight flight = service.findById(id);
+        List<PlaneSeat> planeSeats = planeSeatService.findByIdFlight(id);
+        mv = new ModelAndView();
+        loadData(mv);
+        mv.addObject("flight", flight);
+        mv.addObject("planeSeats", planeSeats);
+        mv.setUrl("/WEB-INF/views/back/flight-detail.jsp");
+        return mv;
+    }
+
+    @Post
+    @Url("/back/search/flight")
+    @Authenticated(roles = {1})
+    public ModelAndView getFlightResearch(@RequestBody @Valid FlightMultiSearchRequest request) {
+        mv = new ModelAndView();
+        loadData(mv);
+        mv.addObject("flights", service.searchFlights(request));
+        mv.setUrl("/WEB-INF/views/back/flights.jsp");
+        return mv;
+    }
+
     @Post
     @Url("/back/add/flight")
     @Authenticated(roles = {1})
     public String addFlightsBackOffice(@RequestBody @Valid FlightRequest request) {
-        mv = new ModelAndView();
         Flight flight = service.save(service.generateFlight(request));
-        mv.setUrl("/WEB-INF/views/back/flight-add.jsp");
+        List<PlaneSeat> list = planeSeatService.savePlaneSeat(request, flight);
+        savePlaneSeats(list);
+        return "redirect:/back/flights";
+    }
+
+    @Post
+    @Url("/back/modify/flight")
+    @Authenticated(roles = {1})
+    public String modifyFlightsBackOffice(@RequestBody @Valid FlightRequest request) {
+        Flight flight = service.save(service.generateFlight(request));
+        List<PlaneSeat> list = planeSeatService.savePlaneSeat(request, flight);
+        savePlaneSeats(list);
         return "redirect:/back/flights";
     }
 
@@ -73,5 +127,11 @@ public class FlightController {
         mv.addObject("seats", seatTypes);
         mv.addObject("planes", planes);
         mv.addObject("cities", cities);
+    }
+
+    private void savePlaneSeats(List<PlaneSeat> planeSeats) {
+        for (PlaneSeat planeSeat : planeSeats) {
+            planeSeatService.save(planeSeat);
+        }
     }
 }

@@ -110,7 +110,7 @@ CREATE TABLE reservation(
    id_reservation SERIAL,
    reservation_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
    total_price NUMERIC(15,2) NOT NULL,
-   status VARCHAR(50) NOT NULL DEFAULT 'CONFIRMED',
+   status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
    passenger_count INTEGER NOT NULL DEFAULT 1,
    id_user INTEGER NOT NULL,
    id_flight INTEGER NOT NULL,
@@ -138,8 +138,7 @@ CREATE TABLE plane_seat(
    id_type INTEGER NOT NULL,
    PRIMARY KEY(id_price),
    FOREIGN KEY(id_flight) REFERENCES flight(id_flight),
-   FOREIGN KEY(id_type) REFERENCES seat_type(id_type),
-   UNIQUE(id_flight, id_type)
+   FOREIGN KEY(id_type) REFERENCES seat_type(id_type)
 );
 
 CREATE TABLE reservation_details(
@@ -214,7 +213,7 @@ INSERT INTO plane (name, manufacturing_date, id_model) VALUES
 ALTER TABLE reservation DROP COLUMN status;
 
 -- Ajouter la colonne status dans reservation_details
-ALTER TABLE reservation_details ADD COLUMN status VARCHAR(50) NOT NULL DEFAULT 'CONFIRMED';
+ALTER TABLE reservation_details ADD COLUMN status VARCHAR(50) NOT NULL DEFAULT 'PENDING';
 
 -- Ajouter la contrainte de vérification sur la nouvelle colonne
 ALTER TABLE reservation_details

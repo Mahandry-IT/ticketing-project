@@ -16,7 +16,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <junit.version>5.12.2</junit.version>
         <postgresql.version>42.6.0</postgresql.version>
-        <hibernate.version>6.2.7.Final</hibernate.version>
+        <hibernate.version>6.6.18.Final</hibernate.version>
         <lombok.version>1.18.38</lombok.version>
 
     </properties>

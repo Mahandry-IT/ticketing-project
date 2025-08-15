@@ -3,14 +3,15 @@ package mg.itu.ticketingproject.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
+import mg.itu.ticketingproject.data.request.FlightMultiSearchRequest;
 import mg.itu.ticketingproject.data.request.FlightRequest;
-import mg.itu.ticketingproject.entity.City;
-import mg.itu.ticketingproject.entity.Flight;
-import mg.itu.ticketingproject.entity.Plane;
-import mg.itu.ticketingproject.entity.PlaneSeat;
+import mg.itu.ticketingproject.entity.*;
 import mg.itu.ticketingproject.util.JPAUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FlightService {
@@ -55,23 +56,25 @@ public class FlightService {
         }
     }
 
-    public List<Flight> searchFlights(String departureCity, String arrivalCity,
-                                      LocalDateTime departureDate, LocalDateTime arrivalDate) {
+    public List<Flight> searchFlights(FlightMultiSearchRequest request) {
         em = JPAUtil.getEntityManager();
         try {
             StringBuilder jpql = new StringBuilder(
                     "SELECT f FROM Flight f JOIN FETCH f.departureCity dc JOIN FETCH f.arrivalCity ac JOIN FETCH f.plane WHERE 1=1");
 
-            if (departureCity != null && !departureCity.trim().isEmpty()) {
+            if (request.getDepartureCity() != null && !request.getDepartureCity().trim().isEmpty()) {
                 jpql.append(" AND LOWER(dc.name) LIKE LOWER(:departureCity)");
             }
-            if (arrivalCity != null && !arrivalCity.trim().isEmpty()) {
+            if (request.getArrivalCity() != null && !request.getArrivalCity().trim().isEmpty()) {
                 jpql.append(" AND LOWER(ac.name) LIKE LOWER(:arrivalCity)");
             }
-            if (departureDate != null) {
+            if (request.getIdPlane() != null && !request.getIdPlane().trim().isEmpty()) {
+                jpql.append(" AND LOWER(f.plane.name) LIKE LOWER(:planeId)");
+            }
+            if (request.getDepartureDate() != null) {
                 jpql.append(" AND f.departureTime >= :departureDate");
             }
-            if (arrivalDate != null) {
+            if (request.getArrivalDate() != null) {
                 jpql.append(" AND f.arrivalTime <= :arrivalDate");
             }
 
@@ -79,17 +82,20 @@ public class FlightService {
 
             TypedQuery<Flight> query = em.createQuery(jpql.toString(), Flight.class);
 
-            if (departureCity != null && !departureCity.trim().isEmpty()) {
-                query.setParameter("departureCity", "%" + departureCity.trim() + "%");
+            if (request.getDepartureCity() != null && !request.getDepartureCity().trim().isEmpty()) {
+                query.setParameter("departureCity", "%" + request.getDepartureCity().trim() + "%");
             }
-            if (arrivalCity != null && !arrivalCity.trim().isEmpty()) {
-                query.setParameter("arrivalCity", "%" + arrivalCity.trim() + "%");
+            if (request.getArrivalCity() != null && !request.getArrivalCity().trim().isEmpty()) {
+                query.setParameter("arrivalCity", "%" + request.getArrivalCity().trim() + "%");
             }
-            if (departureDate != null) {
-                query.setParameter("departureDate", departureDate);
+            if (request.getIdPlane() != null && !request.getIdPlane().trim().isEmpty()) {
+                query.setParameter("planeId", "%" + request.getIdPlane().trim() + "%");
             }
-            if (arrivalDate != null) {
-                query.setParameter("arrivalDate", arrivalDate);
+            if (request.getDepartureDate() != null) {
+                query.setParameter("departureDate", request.getDepartureDate());
+            }
+            if (request.getArrivalDate() != null) {
+                query.setParameter("arrivalDate", request.getArrivalDate());
             }
 
             return query.getResultList();
@@ -144,6 +150,39 @@ public class FlightService {
         }
     }
 
+    @Transactional
+    public void createFlightWithSeats(FlightRequest request) {
+        // 1. Créer et persister le vol
+        Flight flight = generateFlight(request);
+        em.persist(flight);
+
+        // 2. Créer et persister les sièges
+        List<PlaneSeat> seats = createPlaneSeats(request, flight);
+        for (PlaneSeat seat : seats) {
+            em.persist(seat);
+        }
+    }
+
+    private List<PlaneSeat> createPlaneSeats(FlightRequest request, Flight flight) {
+        List<PlaneSeat> seats = new ArrayList<>();
+        for (int i = 0; i < request.getSeatId().length; i++) {
+            PlaneSeat seat = new PlaneSeat();
+            SeatType seatType = em.find(SeatType.class, Integer.parseInt(request.getSeatId()[i]));
+
+            if (seatType == null) {
+                throw new IllegalArgumentException("Seat Type not found");
+            }
+
+            seat.setFlight(flight);
+            seat.setPrice(BigDecimal.valueOf(Double.parseDouble(request.getSeatPrice()[i])));
+            seat.setQuantity(Integer.parseInt(request.getSeatCount()[i]));
+            seat.setType(seatType);
+            seats.add(seat);
+        }
+        return seats;
+    }
+
+
     public Flight generateFlight(FlightRequest request) {
         em = JPAUtil.getEntityManager();
         City departureCity = em.find(City.class, Integer.parseInt(request.getDepartureCity()));
@@ -155,6 +194,8 @@ public class FlightService {
         }
 
         Flight flight = new Flight();
+        Integer id = request.getFlightId() != null ? Integer.parseInt(request.getFlightId()) : null;
+        flight.setId(id);
         flight.setDepartureCity(departureCity);
         flight.setArrivalCity(arrivalCity);
         flight.setPlane(plane);
@@ -162,23 +203,4 @@ public class FlightService {
         flight.setArrivalTime(LocalDateTime.parse(request.getArrivalTime()));
         return flight;
     }
-
-//    public PlaneSeat generatePlaneSeat(FlightRequest request) {
-//        em = JPAUtil.getEntityManager();
-//        City departureCity = em.find(City.class, Integer.parseInt(request.getDepartureCity()));
-//        City arrivalCity = em.find(City.class, Integer.parseInt(request.getArrivalCity()));
-//        Plane plane = em.find(Plane.class, Integer.parseInt(request.getPlane()));
-//
-//        if(departureCity == null || arrivalCity == null || plane == null) {
-//            throw new IllegalArgumentException("City or Plane not found");
-//        }
-//
-//        Flight flight = new Flight();
-//        flight.setDepartureCity(departureCity);
-//        flight.setArrivalCity(arrivalCity);
-//        flight.setPlane(plane);
-//        flight.setDepartureTime(LocalDateTime.parse(request.getDepartureTime()));
-//        flight.setArrivalTime(LocalDateTime.parse(request.getArrivalTime()));
-//        return flight;
-//    }
 }
