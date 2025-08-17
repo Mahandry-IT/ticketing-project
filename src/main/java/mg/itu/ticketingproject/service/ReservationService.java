@@ -38,6 +38,23 @@ public class ReservationService {
                 .getResultList();
     }
 
+    public List<Reservation> findUpcomingByUserId(Integer userId) {
+        em = JPAUtil.getEntityManager();
+        return em.createQuery("""
+            SELECT r FROM Reservation r
+            JOIN FETCH r.user
+            JOIN FETCH r.flight f
+            JOIN FETCH f.arrivalCity
+            JOIN FETCH f.departureCity
+            WHERE r.user.id = :userId
+              AND f.departureTime > CURRENT_TIMESTAMP
+            ORDER BY f.departureTime
+            """, Reservation.class)
+                .setParameter("userId", userId)
+                .getResultList();
+    }
+
+
     public Reservation findById(Integer id) {
         em = JPAUtil.getEntityManager();
         List<Reservation> list = em.createQuery("""

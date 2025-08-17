@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css">
 </head>
 <body>
-<%@ include file="/WEB-INF/views/fragment/navbar.jsp" %>
+<%@ include file="/WEB-INF/views/fragment/navbar-back.jsp" %>
 
 <div class="container">
     <main class="main-content">

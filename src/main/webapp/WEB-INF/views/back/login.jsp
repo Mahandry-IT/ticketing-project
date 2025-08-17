@@ -44,7 +44,7 @@
                 </div>
                 
                 <div class="text-center">
-                    <a href="${pageContext.request.contextPath}/index.jsp">← Retour à l'accueil</a>
+                    <a href="${pageContext.request.contextPath}/">← Retour à l'accueil</a>
                 </div>
             </form>
         </main>

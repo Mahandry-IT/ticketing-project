@@ -25,7 +25,7 @@
       <div class="interface-card">
         <h2>Frontoffice</h2>
         <p>Interface client</p>
-        <a href="frontoffice/loginjsp" class="btn btn-secondary">Accéder au Frontoffice</a>
+        <a href="${pageContext.request.contextPath}/front/login" class="btn btn-secondary">Accéder au Frontoffice</a>
       </div>
     </div>
   </main>

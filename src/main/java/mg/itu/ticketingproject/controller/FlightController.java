@@ -20,6 +20,8 @@ public class FlightController {
     private static final CityService cityService = new CityService();
     private static final SeatTypeService seatTypeService = new SeatTypeService();
     private static final PlaneSeatService planeSeatService = new PlaneSeatService();
+    private static final ReservationService reservationService = new ReservationService();
+    private MySession mySession;
     private ModelAndView mv;
 
     @Get
@@ -28,6 +30,17 @@ public class FlightController {
     public ModelAndView getDashboardBackOffice() {
         mv = new ModelAndView();
         mv.setUrl("/WEB-INF/views/back/dashboard.jsp");
+        return mv;
+    }
+
+    @Get
+    @Url("/front/dashboard")
+    @Authenticated(roles = {2})
+    public ModelAndView getDashboardFrontOffice() {
+        mv = new ModelAndView();
+        List<Reservation> result = reservationService.findUpcomingByUserId((Integer) mySession.get("iduser"));
+        mv.addObject("reservations", result);
+        mv.setUrl("/WEB-INF/views/front/dashboard.jsp");
         return mv;
     }
 

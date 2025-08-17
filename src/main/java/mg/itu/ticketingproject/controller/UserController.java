@@ -27,7 +27,7 @@ public class UserController {
 
     @Post
     @Url("/back/login")
-    public String loginWithCreditential(@RequestBody @Valid LoginRequest loginRequest,
+    public String loginWithCreditentialBack(@RequestBody @Valid LoginRequest loginRequest,
                                               HttpServletRequest request,
                                               HttpServletResponse response) throws Exception {
         Optional<Appuser> result = userService.findUserByCreditential(loginRequest);
@@ -39,7 +39,7 @@ public class UserController {
 
         Appuser user = result.get();
         if (user.getRole().getName().equals("ADMIN")) {
-            session.add("idrole", user.getId());
+            session.add("idrole", user.getRole().getId());
         } else {
             request.setAttribute("error", "You are not authorized to access this page");
             request.getRequestDispatcher("/WEB-INF/views/back/login.jsp").forward(request, response);
@@ -53,6 +53,29 @@ public class UserController {
         ModelAndView mv = new ModelAndView();
         mv.setUrl("/WEB-INF/views/front/login.jsp");
         return mv;
+    }
+
+    @Post
+    @Url("/front/login")
+    public String loginWithCreditentialFront(@RequestBody @Valid LoginRequest loginRequest,
+                                        HttpServletRequest request,
+                                        HttpServletResponse response) throws Exception {
+        Optional<Appuser> result = userService.findUserByCreditential(loginRequest);
+
+        if (result.isEmpty()) {
+            request.setAttribute("error", "Credential not found");
+            request.getRequestDispatcher("/WEB-INF/views/front/login.jsp").forward(request, response);
+        }
+
+        Appuser user = result.get();
+        if (user.getRole().getName().equals("USER")) {
+            session.add("idrole", user.getRole().getId());
+            session.add("iduser", user.getId());
+        } else {
+            request.setAttribute("error", "You are not authorized to access this page");
+            request.getRequestDispatcher("/WEB-INF/views/front/login.jsp").forward(request, response);
+        }
+        return "redirect:/front/dashboard";
     }
 
 
