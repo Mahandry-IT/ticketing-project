@@ -1,4 +1,17 @@
+<%@ page import="mg.itu.ticketingproject.entity.Flight" %>
+<%@ page import="java.util.List" %>
+<%@ page import="mg.itu.ticketingproject.entity.Offer" %>
+<%@ page import="mg.itu.ticketingproject.entity.SeatType" %>
+<%@ page import="mg.itu.ticketingproject.util.FrontUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    List<Flight> flights = (List<Flight>) request.getAttribute("flights");
+    List<Offer> offers = (List<Offer>) request.getAttribute("offers");
+    List<SeatType> seatTypes = (List<SeatType>) request.getAttribute("seatTypes");
+%>
+<%
+    String error = (String) request.getAttribute("error");
+%>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -19,15 +32,24 @@
             <!-- Formulaire d'insertion de promotion -->
             <div class="search-filters">
                 <h3>Créer une Nouvelle Promotion</h3>
-                <form action="${pageContext.request.contextPath}/WEB-INF/views/back/promotionsjsp" method="post">
+                <% if(error != null && !error.isEmpty()) { %>
+                <div class="alert alert-danger mb-3">
+                    <%= error %>
+                </div>
+                <% } %>
+                <form action="${pageContext.request.contextPath}/back/add/offer" method="post">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="flight">Vol concerné *</label>
                             <select id="flight" name="flight" class="form-control" required>
                                 <option value="">Sélectionner un vol</option>
-                                <option value="1">Vol #001 - Paris → London (15/01/2024)</option>
-                                <option value="2">Vol #002 - London → New York (15/01/2024)</option>
-                                <option value="3">Vol #003 - Tokyo → Dubai (16/01/2024)</option>
+                                <% if (flights != null) {
+                                    for (Flight flight : flights) { %>
+                                    <option value="<%= flight.getId() %>">
+                                        <%= flight.getDepartureCity().getName() %> →
+                                        <%= flight.getArrivalCity().getName() %>
+                                    </option>
+                                <% } } %>
                             </select>
                         </div>
                         
@@ -35,9 +57,12 @@
                             <label for="seat_type">Type de siège *</label>
                             <select id="seat_type" name="seat_type" class="form-control" required>
                                 <option value="">Sélectionner un type</option>
-                                <option value="1">Économique</option>
-                                <option value="2">Business</option>
-                                <option value="3">Première</option>
+                                <% if (seatTypes != null) {
+                                    for (SeatType seatType : seatTypes) { %>
+                                    <option value="<%= seatType.getId() %>">
+                                        <%= seatType.getName() %>
+                                    </option>
+                                <% } } %>
                             </select>
                         </div>
                     </div>
@@ -46,34 +71,15 @@
                         <div class="form-group">
                             <label for="number_seats">Nombre de sièges en promotion *</label>
                             <input type="number" id="number_seats" name="number_seats" 
-                                   class="form-control" min="1" max="50" required>
+                                   class="form-control" min="1" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="discount">Pourcentage de réduction (%) *</label>
                             <input type="number" id="discount" name="discount" 
-                                   class="form-control" min="1" max="90" step="0.01" required>
+                                   class="form-control" min="1" max="100" step="0.01" required>
                         </div>
                     </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="start_date">Date de début</label>
-                            <input type="date" id="start_date" name="start_date" class="form-control">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="end_date">Date de fin</label>
-                            <input type="date" id="end_date" name="end_date" class="form-control">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="description">Description de la promotion</label>
-                        <input type="text" id="description" name="description" 
-                               class="form-control" placeholder="Ex: Promotion de lancement, Offre spéciale weekend...">
-                    </div>
-                    
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">Créer la Promotion</button>
                     </div>
@@ -82,7 +88,6 @@
             
             <!-- Liste des promotions existantes -->
             <div class="table-container">
-                <h3>Promotions Actives</h3>
                 <table class="table">
                     <thead>
                         <tr>
@@ -90,48 +95,31 @@
                             <th>Type de Siège</th>
                             <th>Nb Sièges</th>
                             <th>Réduction</th>
-                            <th>Période</th>
-                            <th>Description</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Paris → London<br><small>15/01/2024</small></td>
-                            <td>Économique</td>
-                            <td>20</td>
-                            <td>25%</td>
-                            <td>10/01 - 20/01</td>
-                            <td>Promotion de lancement</td>
-                            <td class="actions">
-                                <button class="btn btn-warning">Modifier</button>
-                                <button class="btn btn-danger">Supprimer</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>London → New York<br><small>15/01/2024</small></td>
-                            <td>Business</td>
-                            <td>5</td>
-                            <td>15%</td>
-                            <td>12/01 - 18/01</td>
-                            <td>Offre spéciale Business</td>
-                            <td class="actions">
-                                <button class="btn btn-warning">Modifier</button>
-                                <button class="btn btn-danger">Supprimer</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Tokyo → Dubai<br><small>16/01/2024</small></td>
-                            <td>Première</td>
-                            <td>2</td>
-                            <td>30%</td>
-                            <td>14/01 - 16/01</td>
-                            <td>Last minute</td>
-                            <td class="actions">
-                                <button class="btn btn-warning">Modifier</button>
-                                <button class="btn btn-danger">Supprimer</button>
-                            </td>
-                        </tr>
+                        <% for (Offer offer : offers) { %>
+                            <tr>
+                                <td>
+                                    <%= offer.getFlight().getDepartureCity().getName() %> →
+                                    <%= offer.getFlight().getArrivalCity().getName() %><br>
+                                </td>
+                                <td>
+                                    <%= offer.getType().getName() %>
+                                </td>
+                                <td>
+                                    <%= offer.getNumber() %>
+                                </td>
+                                <td>
+                                    <%= FrontUtil.formatNumber(offer.getOffer().doubleValue(), "#,##0.00") %>%
+                                </td>
+                                <td class="actions">
+                                    <a href="${pageContext.request.contextPath}/back/modify/offer?id=<%= offer.getId() %>"><button class="btn btn-warning">Modifier</button></a>
+                                    <a href="${pageContext.request.contextPath}/back/delete/offer?id=<%= offer.getId() %>"><button class="btn btn-danger">Supprimer</button></a>
+                                </td>
+                            </tr>
+                        <% } %>
                     </tbody>
                 </table>
             </div>

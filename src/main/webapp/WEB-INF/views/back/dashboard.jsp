@@ -32,7 +32,7 @@
                 <div class="interface-card">
                     <h3>Promotions</h3>
                     <p>Créer des offres promotionnelles</p>
-                    <a href="${pageContext.request.contextPath}/WEB-INF/views/back/promotions.jsp" class="btn btn-success">Gérer les promotions</a>
+                    <a href="${pageContext.request.contextPath}/back/offers" class="btn btn-success">Gérer les promotions</a>
                 </div>
                 
                 <div class="interface-card">

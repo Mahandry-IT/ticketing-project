@@ -43,6 +43,22 @@ public class FlightService {
         }
     }
 
+    public List<Flight> getFlightsWithoutAllOffers() {
+        em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Flight> query = em.createQuery(
+                    "SELECT f FROM Flight f JOIN FETCH f.departureCity JOIN FETCH f.arrivalCity JOIN FETCH f.plane " +
+                            "LEFT JOIN f.offers o " +
+                            "WHERE (SELECT COUNT(o2) FROM Offer o2 WHERE o2.flight = f) < " +
+                            "      (SELECT COUNT(st) FROM SeatType st)",
+                    Flight.class
+            );
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
     public Flight findById(Integer id) {
         em = JPAUtil.getEntityManager();
         try {

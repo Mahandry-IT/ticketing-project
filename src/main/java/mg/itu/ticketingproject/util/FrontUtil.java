@@ -33,7 +33,7 @@ public class FrontUtil {
         return dateTime.format(formatter);
     }
 
-    public static String formaterNombreAvecEspace(double nombre, String format) {
+    public static String formatNumber(double nombre, String format) {
         if (format == null || format.isEmpty()) {
             return Double.toString(nombre);
         }
