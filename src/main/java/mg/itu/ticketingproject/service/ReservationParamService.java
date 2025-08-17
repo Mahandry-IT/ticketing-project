@@ -1,33 +1,46 @@
 package mg.itu.ticketingproject.service;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
 import mg.itu.ticketingproject.entity.ReservationParam;
 import mg.itu.ticketingproject.util.JPAUtil;
 
 public class ReservationParamService {
-    @PersistenceContext
-    EntityManager em;
 
     public ReservationParam createOrUpdate(ReservationParam param) {
-        em = JPAUtil.getEntityManager();
-        ReservationParam existing = getLast();
+        EntityManager em = JPAUtil.getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        ReservationParam result;
 
-        if (existing != null) {
-            existing.setCancelTime(param.getCancelTime());
-            existing.setReservationTime(param.getReservationTime());
-            em.getTransaction().commit();
-            return em.merge(existing);
-        } else {
-            // Create new
-            em.persist(param);
-            em.getTransaction().commit();
-            return param;
+        try {
+            tx.begin();
+
+            ReservationParam existing = getLast();
+
+            if (existing != null) {
+                existing.setCancelTime(param.getCancelTime());
+                existing.setReservationTime(param.getReservationTime());
+                result = em.merge(existing);  // merge DANS la transaction
+            } else {
+                em.persist(param);
+                result = param;
+            }
+
+            tx.commit();  // commit après persist/merge
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            throw e;
+        } finally {
+            em.close();
         }
+
+        return result;
     }
 
+
     public ReservationParam getLast() {
-        em = JPAUtil.getEntityManager();
+        EntityManager em = JPAUtil.getEntityManager();
         try {
             return em.createQuery(
                             "SELECT rp FROM ReservationParam rp ORDER BY rp.id DESC",

@@ -38,7 +38,7 @@
                 <div class="interface-card">
                     <h3>Configuration</h3>
                     <p>Paramètres système et délais</p>
-                    <a href="${pageContext.request.contextPath}/WEB-INF/views/back/config.jsp" class="btn btn-warning">Configuration</a>
+                    <a href="${pageContext.request.contextPath}/back/add/reservation-param" class="btn btn-warning">Configuration</a>
                 </div>
             </div>
         </main>
