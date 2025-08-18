@@ -31,11 +31,11 @@ public class FlightService {
         }
     }
 
-    public List<Flight> getTodayFlight() {
+    public List<Flight> getNotFinishedFLight() {
         em = JPAUtil.getEntityManager();
         try {
             TypedQuery<Flight> query = em.createQuery(
-                    "SELECT f FROM Flight f JOIN FETCH f.departureCity JOIN FETCH f.arrivalCity JOIN FETCH f.plane WHERE f.departureTime =  current_timestamp ORDER BY f.departureTime",
+                    "SELECT f FROM Flight f JOIN FETCH f.departureCity JOIN FETCH f.arrivalCity JOIN FETCH f.plane WHERE f.departureTime >=  current_timestamp ORDER BY f.departureTime",
                     Flight.class);
             return query.getResultList();
         } finally {

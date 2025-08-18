@@ -1,109 +1,134 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="mg.itu.ticketingproject.util.FrontUtil" %>
+<%@ page import="java.util.Objects" %>
+<%@ page import="mg.itu.ticketingproject.entity.*" %>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détails du Vol - Backoffice</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css">
+    <title>Detail Vol - Backoffice</title>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/main.css">
 </head>
 <body>
-    <%@ include file="/WEB-INF/views/fragment/navbar-back.jsp" %>
+<%@ include file="/WEB-INF/views/fragment/navbar-back.jsp" %>
 
-    <div class="container">
-        <main class="main-content">
-            <div class="content-header">
-                <h2>Détails du Vol #001</h2>
-                <div class="actions">
-                    <a href="${pageContext.request.contextPath}/back/flights" class="btn btn-secondary">← Retour</a>
-                    <a href="${pageContext.request.contextPath}/WEB-INF/views/back/flight-edit.jsp?id=1" class="btn btn-warning">Modifier</a>
+<div class="container">
+    <main class="main-content">
+        <div class="content-header">
+            <h2>Détail d'un Vol</h2>
+            <a href="<%= request.getContextPath() %>/back/flights" class="btn btn-secondary">← Retour à la liste</a>
+        </div>
+
+        <%
+            List<City> cities = (List<City>) request.getAttribute("cities");
+            List<Plane> planes = (List<Plane>) request.getAttribute("planes");
+            List<SeatType> types = (List<SeatType>) request.getAttribute("seats");
+            Flight flight = (Flight) request.getAttribute("flight");
+            List<PlaneSeat> planeSeat = (List<PlaneSeat>) request.getAttribute("planeSeats");
+        %>
+
+        <form class="form-container" style="max-width: 800px;">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="departure_city">Ville de départ *</label>
+                    <select id="departure_city" name="departure_city" class="form-control" required>
+                        <option value="">Sélectionner une ville</option>
+                        <%
+                            if (cities != null) {
+                                for (City city : cities) {
+                        %>
+                        <% if (Objects.equals(city.getId(), flight.getDepartureCity().getId())) {%>
+                            <option value="<%= city.getId() %>" selected><%= city.getName() %></option>
+                        <% } else {%>
+                            <option value="<%= city.getId() %>"><%= city.getName() %></option>
+                        <% } %>
+                        <%
+                                }
+                            }
+                        %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="arrival_city">Ville d'arrivée *</label>
+                    <select id="arrival_city" name="arrival_city" class="form-control" required>
+                        <option value="">Sélectionner une ville</option>
+                        <%
+                            if (cities != null) {
+                                for (City city : cities) {
+                        %>
+                        <% if (Objects.equals(city.getId(), flight.getArrivalCity().getId())) {%>
+                        <option value="<%= city.getId() %>" selected><%= city.getName() %></option>
+                        <% } else {%>
+                        <option value="<%= city.getId() %>"><%= city.getName() %></option>
+                        <% } %>
+                        <%
+                                }
+                            }
+                        %>
+                    </select>
                 </div>
             </div>
-            
-            <div class="interface-selection">
-                <div class="interface-card">
-                    <h3>Informations Générales</h3>
-                    <div style="text-align: left;">
-                        <p><strong>Départ:</strong> Paris (CDG)</p>
-                        <p><strong>Arrivée:</strong> London (LHR)</p>
-                        <p><strong>Date/Heure Départ:</strong> 15/01/2024 08:00</p>
-                        <p><strong>Date/Heure Arrivée:</strong> 15/01/2024 09:30</p>
-                        <p><strong>Durée:</strong> 1h 30min</p>
-                        <p><strong>Avion:</strong> Boeing 737-800</p>
-                    </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="departure_date">Temps de départ *</label>
+                    <input type="datetime-local" id="departure_date" name="departure_date" class="form-control"  value="<%= flight.getDepartureTime()%>" required>
                 </div>
-                
-                <div class="interface-card">
-                    <h3>Disponibilité des Sièges</h3>
-                    <div style="text-align: left;">
-                        <p><strong>Économique:</strong> 142/150 disponibles</p>
-                        <p><strong>Business:</strong> 28/30 disponibles</p>
-                        <p><strong>Première:</strong> 12/12 disponibles</p>
-                        <p><strong>Total Réservations:</strong> 10</p>
-                    </div>
+                <div class="form-group">
+                    <label for="arrival_date">Temps d'arrivée *</label>
+                    <input type="datetime-local" id="arrival_date" name="arrival_date" class="form-control" value="<%= flight.getArrivalTime()%>" required>
                 </div>
             </div>
-            
-            <!-- Formulaire d'insertion de détails -->
-            <div class="search-filters">
-                <h3>Ajouter des Détails au Vol</h3>
-                <form class="form-row" action="${pageContext.request.contextPath}/WEB-INF/views/back/flight-details.jsp" method="post">
-                    <div class="form-group">
-                        <label for="detail_type">Type de détail</label>
-                        <select id="detail_type" name="detail_type" class="form-control">
-                            <option value="meal">Service de repas</option>
-                            <option value="entertainment">Divertissement</option>
-                            <option value="wifi">WiFi disponible</option>
-                            <option value="baggage">Politique bagages</option>
-                            <option value="other">Autre</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="detail_description">Description</label>
-                        <input type="text" id="detail_description" name="detail_description" 
-                               class="form-control" placeholder="Description du détail">
-                    </div>
-                    
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Ajouter</button>
-                    </div>
-                </form>
+
+            <div class="form-group">
+                <label for="plane">Avion *</label>
+                <select id="plane" name="plane" class="form-control" required>
+                    <option value="">Sélectionner un avion</option>
+                    <%
+                        if (planes != null) {
+                            for (Plane plane : planes) {
+                    %>
+                    <% if (Objects.equals(plane.getId(), flight.getPlane().getId())) {%>
+                        <option value="<%= plane.getId() %>" selected>
+                            <%= plane.getName() %> - <%= plane.getModel().getName() %>
+                        </option>
+                    <% } else {%>
+                        <option value="<%= plane.getId() %>">
+                            <%= plane.getName() %> - <%= plane.getModel().getName() %>
+                        </option>
+                    <% } %>
+                    <%
+                            }
+                        }
+                    %>
+                </select>
             </div>
-            
-            <!-- Liste des détails existants -->
-            <div class="table-container">
-                <h3>Détails du Vol</h3>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Description</th>
-                            <th>Date d'ajout</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Service de repas</td>
-                            <td>Repas chaud servi en classe Business et Première</td>
-                            <td>10/01/2024</td>
-                            <td class="actions">
-                                <button class="btn btn-danger">Supprimer</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>WiFi disponible</td>
-                            <td>WiFi gratuit pour tous les passagers</td>
-                            <td>10/01/2024</td>
-                            <td class="actions">
-                                <button class="btn btn-danger">Supprimer</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div>
+
+            <h3 class="mt-4 mb-3">Configuration des Sièges et Prix</h3>
+                <%
+                    if (types != null) {
+                        for (int i = 0; i < planeSeat.size(); i++) {
+                %>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="seat_count">Nombre de siège <%= FrontUtil.uniformalizedLetter(types.get(i).getName()) %></label>
+                        <input type="number" id="seat_count" name="seat_count" class="form-control" min="0" value="<%= planeSeat.get(i).getQuantity()%>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="seat_price">Prix <%= FrontUtil.uniformalizedLetter(types.get(i).getName()) %></label>
+                        <input type="number" id="seat_price" name="seat_price" class="form-control" min="0" step="0.01" value="<%= planeSeat.get(i).getPrice()%>" required>
+                    </div>
+                </div>
+                <%
+                        }
+                    }
+                %>
+        </form>
+    </main>
+</div>
 </body>
 </html>

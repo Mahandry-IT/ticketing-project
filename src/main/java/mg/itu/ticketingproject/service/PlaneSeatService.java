@@ -3,6 +3,7 @@ package mg.itu.ticketingproject.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import mg.itu.ticketingproject.data.dto.SeatAvailabilityDTO;
 import mg.itu.ticketingproject.data.request.FlightRequest;
 import mg.itu.ticketingproject.entity.*;
 import mg.itu.ticketingproject.util.JPAUtil;
@@ -151,4 +152,37 @@ public class PlaneSeatService {
         }
     }
 
+    public List<SeatAvailabilityDTO> findSeatAvailabilityByFlight(int flightId) {
+        em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<SeatAvailabilityDTO> query = em.createQuery(
+                    "SELECT new mg.itu.ticketingproject.data.dto.SeatAvailabilityDTO(st.name, ps.price, ps.quantity, ps.quantity - COALESCE(SUM(rdCount.countReserved), 0)) " +
+                            "FROM PlaneSeat ps " +
+                            "JOIN ps.type st " +
+                            "LEFT JOIN (" +
+                            "   SELECT rd.seatType.id AS seatTypeId, r.flight.id AS flightId, COUNT(rd) AS countReserved " +
+                            "   FROM ReservationDetail rd " +
+                            "   JOIN rd.reservation r " +
+                            "   GROUP BY rd.seatType.id, r.flight.id" +
+                            ") rdCount " +
+                            "ON rdCount.seatTypeId = ps.type.id AND rdCount.flightId = ps.flight.id " +
+                            "WHERE ps.flight.id = :flightId " +
+                            "GROUP BY st.name, ps.price, ps.quantity",
+                    SeatAvailabilityDTO.class
+            );
+            query.setParameter("flightId", flightId);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public boolean checkIfUserCanReserve(int flightId) {
+        List<SeatAvailabilityDTO> list = findSeatAvailabilityByFlight(flightId);
+        int availableSeats = 0;
+        for (SeatAvailabilityDTO seatAvailabilityDTO : list) {
+            availableSeats += seatAvailabilityDTO.getAvailableSeats();
+        }
+        return availableSeats != 0;
+    }
 }

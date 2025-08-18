@@ -4,11 +4,13 @@ import jakarta.validation.Valid;
 import lombok.Setter;
 import mg.itu.annotation.*;
 import mg.itu.prom16.ModelAndView;
+import mg.itu.ticketingproject.data.dto.SeatAvailabilityDTO;
 import mg.itu.ticketingproject.data.request.FlightMultiSearchRequest;
 import mg.itu.ticketingproject.data.request.FlightRequest;
 import mg.itu.ticketingproject.entity.*;
 import mg.itu.ticketingproject.service.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @AnnotationController
@@ -57,6 +59,19 @@ public class FlightController {
     }
 
     @Get
+    @Url("/front/flights")
+    @Authenticated(roles = {2})
+    public ModelAndView getFlightsFrontOffice() {
+        mv = new ModelAndView();
+        List<Flight> flights = service.getNotFinishedFLight();
+        mv.addObject("flights", flights);
+        mv.addObject("checkedSeats", getSeatAvailability(flights));
+        loadData(mv);
+        mv.setUrl("/WEB-INF/views/front/flights.jsp");
+        return mv;
+    }
+
+    @Get
     @Url("/back/add/flight")
     @Authenticated(roles = {1})
     public ModelAndView getFlightsAddingFormBackOffice() {
@@ -98,7 +113,20 @@ public class FlightController {
         loadData(mv);
         mv.addObject("flight", flight);
         mv.addObject("planeSeats", planeSeats);
-        mv.setUrl("/WEB-INF/views/back/flight-detail.jsp");
+        mv.setUrl("/WEB-INF/views/back/flight-details.jsp");
+        return mv;
+    }
+
+    @Get
+    @Url("/front/detail/flight")
+    @Authenticated(roles = {2})
+    public ModelAndView getFlightsDetailingFormFrontOffice(@Parametre(name = "id") Integer id) {
+        Flight flight = service.findById(id);
+        mv = new ModelAndView();
+        mv.addObject("flight", flight);
+        mv.addObject("planeSeats", planeSeatService.findSeatAvailabilityByFlight(id));
+        mv.addObject("total", reservationService.countReservationsByFlight(id));
+        mv.setUrl("/WEB-INF/views/front/flight-details.jsp");
         return mv;
     }
 
@@ -146,5 +174,13 @@ public class FlightController {
         for (PlaneSeat planeSeat : planeSeats) {
             planeSeatService.save(planeSeat);
         }
+    }
+
+    private HashMap<Integer, Boolean>  getSeatAvailability(List<Flight> list) {
+        HashMap<Integer, Boolean> map = new HashMap<>();
+        for (Flight dto : list) {
+            map.put(dto.getId(), planeSeatService.checkIfUserCanReserve(dto.getId()));
+        }
+        return map;
     }
 }

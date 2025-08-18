@@ -1,5 +1,6 @@
 package mg.itu.ticketingproject.controller;
 
+import jakarta.servlet.http.HttpSession;
 import mg.itu.ticketingproject.data.request.LoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -53,6 +54,14 @@ public class UserController {
         ModelAndView mv = new ModelAndView();
         mv.setUrl("/WEB-INF/views/front/login.jsp");
         return mv;
+    }
+
+    @Get
+    @Url("/logout")
+    public  String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        session.invalidate();
+        return "redirect:/";
     }
 
     @Post

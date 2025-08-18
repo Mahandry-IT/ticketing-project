@@ -2,6 +2,7 @@ package mg.itu.ticketingproject.service;
 
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
+import mg.itu.ticketingproject.data.dto.SeatAvailabilityDTO;
 import mg.itu.ticketingproject.entity.*;
 import mg.itu.ticketingproject.util.JPAUtil;
 
@@ -25,6 +26,24 @@ public class ReservationService {
                 ORDER BY r.id
                 """, Reservation.class).getResultList();
     }
+
+    public Long countReservationsByFlight(int flightId) {
+        em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(r) " +
+                            "FROM Reservation r " +
+                            "WHERE r.flight.id = :flightId",
+                    Long.class
+            );
+            query.setParameter("flightId", flightId);
+            return query.getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
+
+
 
     public List<Reservation> findByUserId(Integer userId) {
         em = JPAUtil.getEntityManager();
@@ -194,5 +213,4 @@ public class ReservationService {
 
         return q.getResultList();
     }
-
 }

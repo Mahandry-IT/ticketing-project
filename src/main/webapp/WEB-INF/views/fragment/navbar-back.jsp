@@ -9,7 +9,7 @@
             <li><a href="${pageContext.request.contextPath}/WEB-INF/views/back/reservations.jsp">Réservations</a></li>
             <li><a href="${pageContext.request.contextPath}/back/offers">Promotions</a></li>
             <li><a href="${pageContext.request.contextPath}/WEB-INF/views/back/config.jsp" class="active">Configuration</a></li>
-            <li><a href="${pageContext.request.contextPath}/back/logout">Déconnexion</a></li>
+            <li><a href="${pageContext.request.contextPath}/logout">Déconnexion</a></li>
         </ul>
     </div>
 </nav>
