@@ -8,11 +8,12 @@ import mg.itu.ticketingproject.util.JPAUtil;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ReservationService {
 
-    @PersistenceContext
     private EntityManager em;
 
     public List<Reservation> findAll() {
@@ -68,84 +69,97 @@ public class ReservationService {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    /**
-     * Crée une réservation + détails, sans DTO.
-     * Tous les tableaux/listes doivent avoir la même taille (>0).
-     * Status des détails = PENDING par défaut.
-     */
-    @Transactional
     public Reservation create(Integer userId,
                               Integer flightId,
-                              LocalDateTime reservationTime, // peut être null => now
+                              LocalDateTime reservationTime,
                               List<Integer> seatTypeIds,
                               List<String> passengerNames,
                               List<Integer> ages,
                               List<String> passports,
-                              List<BigDecimal> prices) {
-        em = JPAUtil.getEntityManager();
-        // ---- validations basiques
-        Objects.requireNonNull(seatTypeIds, "seatTypeIds requis");
-        Objects.requireNonNull(passengerNames, "passengerNames requis");
-        Objects.requireNonNull(ages, "ages requis");
-        Objects.requireNonNull(passports, "passports requis");
-        Objects.requireNonNull(prices, "prices requis");
+                              List<BigDecimal> prices) throws Exception {
 
-        int n = seatTypeIds.size();
-        if (n == 0 || n != passengerNames.size() || n != ages.size() || n != passports.size() || n != prices.size()) {
-            throw new IllegalArgumentException("Les listes doivent être non vides et de même taille");
-        }
+        EntityManager em = JPAUtil.getEntityManager();
+        EntityTransaction tx = em.getTransaction();
 
-        // ---- résolutions
-        Appuser user = em.find(Appuser.class, userId, LockModeType.NONE);
-        if (user == null) throw new IllegalArgumentException("appuser introuvable: " + userId);
+        try {
+            tx.begin();
 
-        Flight flight = em.find(Flight.class, flightId, LockModeType.NONE);
-        if (flight == null) throw new IllegalArgumentException("flight introuvable: " + flightId);
-
-        // ---- créer la réservation (sans détails d'abord)
-        Reservation reservation = new Reservation();
-        reservation.setUser(user);
-        reservation.setFlight(flight);
-        reservation.setReservationTime(reservationTime != null ? reservationTime : LocalDateTime.now());
-        reservation.setPassengerCount(n);
-        reservation.setTotalPrice(BigDecimal.ZERO); // temporaire
-
-        em.persist(reservation);
-        // em.flush(); // décommente si tu veux forcer l’ID tout de suite
-
-        // ---- créer les détails (status = PENDING)
-        BigDecimal total = BigDecimal.ZERO;
-        for (int i = 0; i < n; i++) {
-            Integer stId = seatTypeIds.get(i);
-            String name = passengerNames.get(i);
-            Integer age = ages.get(i);
-            String passport = passports.get(i);
-            BigDecimal price = prices.get(i);
-
-            if (stId == null || age == null || passport == null || price == null) {
-                throw new IllegalArgumentException("Champs manquants dans la ligne " + i);
+            Appuser user = em.find(Appuser.class, userId);
+            if (user == null) {
+                throw new IllegalArgumentException("Utilisateur introuvable");
             }
 
-            SeatType seatType = em.find(SeatType.class, stId, LockModeType.NONE);
-            if (seatType == null) throw new IllegalArgumentException("SeatType introuvable: " + stId);
+            Flight flight = em.find(Flight.class, flightId);
+            if (flight == null) {
+                throw new IllegalArgumentException("Vol introuvable");
+            }
 
-            ReservationDetail rd = new ReservationDetail();
-            rd.setReservation(reservation);       // parent déjà MANAGED
-            rd.setSeatType(seatType);
-            rd.setPassengerName(name);
-            rd.setAge(age);
-            rd.setPassport(passport);
-            rd.setPrice(price);
-            rd.setStatus("PENDING");              // défaut demandé
+            ReservationParamService reservationParamService = new ReservationParamService();
+            ReservationParam param = reservationParamService.getLast();
+            if (param == null) {
+                param = new ReservationParam();
+                param.setCancelTime(0);
+                param.setReservationTime(0);
+            }
+            if (reservationTime.isBefore(flight.getDepartureTime().minusHours(param.getReservationTime()))) {
+                throw new IllegalStateException("Réservation impossible : délai dépassé");
+            }
 
-            em.persist(rd);
-            total = total.add(price);
+            int n = passengerNames.size();
+            if (seatTypeIds.size() != n || ages.size() != n || passports.size() != n || prices.size() != n) {
+                throw new IllegalArgumentException("Listes passagers incohérentes");
+            }
+
+            PlaneSeatService planeSeatService = new PlaneSeatService();
+
+            Map<Integer, Long> counts = seatTypeIds.stream()
+                    .collect(Collectors.groupingBy(i -> i, Collectors.counting()));
+
+            counts.forEach((key, value) -> {
+                long availableSeats = planeSeatService.placeleft(flightId, key);
+                if (availableSeats < value) {
+                    throw new IllegalStateException("Pas assez de sièges disponibles pour le type " + key);
+                }
+            });
+
+
+            Reservation reservation = new Reservation();
+            reservation.setUser(user);
+            reservation.setFlight(flight);
+            reservation.setReservationTime(reservationTime);
+            reservation.setTotalPrice(prices.stream()
+                    .reduce(BigDecimal.ZERO, BigDecimal::add));
+
+            em.persist(reservation);
+
+
+
+            for (int i = 0; i < passengerNames.size(); i++) {
+                SeatType seatType = em.find(SeatType.class, seatTypeIds.get(i));
+
+//                BigDecimal price = planeSeatService.findByIdFlight(flightId).get(seatTypeIds.get(i)).getPrice();
+
+                ReservationDetail detail = new ReservationDetail();
+                detail.setReservation(reservation);
+                detail.setSeatType(seatType);
+                detail.setPassengerName(passengerNames.get(i));
+                detail.setAge(ages.get(i));
+                detail.setPassport(passports.get(i));
+                detail.setPrice(prices.get(i));
+                detail.setStatus("PENDING");
+
+                em.persist(detail);
+            }
+
+            tx.commit();
+            return reservation;
+
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            throw e;
+        } finally {
+            em.close();
         }
-
-        // ---- mettre à jour le total
-        reservation.setTotalPrice(total);
-
-        return reservation; // flush/commit auto à la fin de la TX
     }
 
     /**

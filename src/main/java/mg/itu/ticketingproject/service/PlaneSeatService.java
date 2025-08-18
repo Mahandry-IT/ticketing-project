@@ -119,4 +119,36 @@ public class PlaneSeatService {
         return list;
     }
 
+    public int placeleft(int flightId, int seatTypeId) {
+        em = JPAUtil.getEntityManager();
+        try {
+            Integer totalSeats = em.createQuery(
+                            "SELECT ps.quantity " +
+                                    "FROM PlaneSeat ps " +
+                                    "WHERE ps.flight.id = :flightId " +
+                                    "AND ps.type.id = :seatTypeId", Integer.class)
+                    .setParameter("flightId", flightId)
+                    .setParameter("seatTypeId", seatTypeId)
+                    .getSingleResult();
+
+            if (totalSeats == null || totalSeats <= 0) {
+                return 0;
+            }
+
+            Long reservedSeats = em.createQuery(
+                            "SELECT COUNT(rd) " +
+                                    "FROM ReservationDetail rd " +
+                                    "WHERE rd.reservation.flight.id = :flightId " +
+                                    "AND rd.seatType.id = :seatTypeId " +
+                                    "AND rd.status != 'CANCELED'", Long.class)
+                    .setParameter("flightId", flightId)
+                    .setParameter("seatTypeId", seatTypeId)
+                    .getSingleResult();
+
+            return totalSeats.intValue() - reservedSeats.intValue();
+        } finally {
+            em.close();
+        }
+    }
+
 }
