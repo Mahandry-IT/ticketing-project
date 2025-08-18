@@ -4,13 +4,14 @@
 <%@ page import="mg.itu.ticketingproject.entity.Plane" %>
 <%@ page import="mg.itu.ticketingproject.entity.City" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Map" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
     List<Flight> flights = (List<Flight>) request.getAttribute("flights");
     List<Plane> planes = (List<Plane>) request.getAttribute("planes");
     List<City> cities = (List<City>) request.getAttribute("cities");
-    HashMap<Integer, Boolean> checkedSeats = (HashMap<Integer, Boolean>) request.getAttribute("checkedSeats");
+    Map<Integer, Boolean> checkedSeats = (Map<Integer, Boolean>) request.getAttribute("checkedSeats");
 
 %>
 <!DOCTYPE html>

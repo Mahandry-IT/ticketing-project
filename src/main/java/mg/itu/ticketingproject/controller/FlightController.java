@@ -10,8 +10,11 @@ import mg.itu.ticketingproject.data.request.FlightRequest;
 import mg.itu.ticketingproject.entity.*;
 import mg.itu.ticketingproject.service.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @AnnotationController
 @Setter
@@ -142,6 +145,19 @@ public class FlightController {
     }
 
     @Post
+    @Url("/front/search/flight")
+    @Authenticated(roles = {2})
+    public ModelAndView getFlightResearchFront(@RequestBody @Valid FlightMultiSearchRequest request) {
+        mv = new ModelAndView();
+        loadData(mv);
+        List<Flight> flights = service.searchFlights(request);
+        mv.addObject("flights", flights);
+        mv.addObject("checkedSeats", getSeatAvailability(flights));
+        mv.setUrl("/WEB-INF/views/front/flights.jsp");
+        return mv;
+    }
+
+    @Post
     @Url("/back/add/flight")
     @Authenticated(roles = {1})
     public String addFlightsBackOffice(@RequestBody @Valid FlightRequest request) {
@@ -176,11 +192,12 @@ public class FlightController {
         }
     }
 
-    private HashMap<Integer, Boolean>  getSeatAvailability(List<Flight> list) {
-        HashMap<Integer, Boolean> map = new HashMap<>();
-        for (Flight dto : list) {
-            map.put(dto.getId(), planeSeatService.checkIfUserCanReserve(dto.getId()));
-        }
-        return map;
+    private Map<Integer, Boolean> getSeatAvailability(List<Flight> list) {
+        return list.stream().collect(Collectors.toMap(
+                Flight::getId,
+                dto -> planeSeatService.checkIfUserCanReserve(dto.getId())
+                        && dto.getDepartureTime().isAfter(LocalDateTime.now())
+        ));
     }
+
 }
