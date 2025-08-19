@@ -80,6 +80,17 @@ public class ReservationController {
     }
 
     @Get
+    @Url("/front/modify/reservation")
+    @Authenticated(roles = {2})
+    public ModelAndView modifyReservation(@Parametre(name = "id") Integer id) {
+        mv = new ModelAndView();
+        mv.addObject("reservation", reservationService.findById(id));
+        mv.addObject("seatTypes", seatTypeService.findAll());
+        mv.setUrl("/WEB-INF/views/front/reservation-modify.jsp");
+        return mv;
+    }
+
+    @Get
     @Url("/back/cancel/reservation")
     @Authenticated(roles = {1})
     public String cancelReservationAdmin(@Parametre(name = "id") Integer id) {

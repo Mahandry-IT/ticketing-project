@@ -92,16 +92,13 @@
             <label>Âge</label>
             <input type="number" name="age" class="age form-control" value="<%= reservation.getReservationDetails().get(i).getAge() %>" required>
           </div>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="promotion">Promotion</label>
-          <input type="number" id="promotion" name="promotion" value="<%= reservation.getReservationDetails().get(i).getPrice() %>" class="form-control" disabled>
-        </div>
-        <div class="form-group">
-          <label for="price">Prix</label>
-          <input type="number" id="price" name="price" value="<%= reservation.getReservationDetails().get(i).getPrice() %>" class="form-control">
+
+          <div class="form-group">
+            <label>Prix</label>
+            <input type="number" name="prix" class="prix form-control" value="<%= reservation.getReservationDetails().get(i).getPrice() %>" required>
+          </div>
+
+          <input type="hidden" name="promotion" class="price" value="<%= reservation.getReservationDetails().get(i).getPrice() %>">
         </div>
       </div>
       <% } %>
@@ -126,25 +123,23 @@
     function attachEventsToPassenger(block) {
       const seatTypeSelect = block.querySelector(".seat-type");
       const ageInput = block.querySelector(".age");
-      const priceInput = div.querySelector("input[name='price']");
-      const promotionValue = div.querySelector("input[name='promotion']");
+      const priceInput = block.querySelector(".price");
+      const priceValue = block.querySelector(".prix");
 
       async function updatePrice() {
-        const seatTypeId = parseInt(seatTypeSelect.value); // <-- force number
+        const seatTypeId = parseInt(seatTypeSelect.value);
         const age = parseInt(ageInput.value);
 
         if (seatTypeId && !isNaN(age)) {
           try {
             const price = await getSeatPrice(flightId, seatTypeId, age);
-            promotionValue.value = price.promotionPrice;
-            priceInput.value = price.price;
+            priceValue.value = price.price;
+            priceInput.value = price.promotionPrice;
           } catch (err) {
             console.error(err);
-            promotionValue.value = 0;
             priceInput.value = 0;
           }
         } else {
-          promotionValue.value = 0;
           priceInput.value = 0;
         }
       }

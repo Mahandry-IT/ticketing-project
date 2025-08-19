@@ -35,12 +35,6 @@
         <p>Consultez et gérez vos réservations</p>
         <a href="${pageContext.request.contextPath}/front/reservations" class="btn btn-secondary">Voir mes réservations</a>
       </div>
-
-      <div class="interface-card">
-        <h3>Promotions</h3>
-        <p>Découvrez nos offres spéciales</p>
-        <a href="${pageContext.request.contextPath}/front/offer" class="btn btn-success">Voir les promotions</a>
-      </div>
     </div>
 
     <!-- Dernières réservations -->

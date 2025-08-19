@@ -22,13 +22,7 @@
                     <p>Créer, modifier et supprimer des vols</p>
                     <a href="${pageContext.request.contextPath}/back/flights" class="btn btn-primary">Gérer les vols</a>
                 </div>
-                
-                <div class="interface-card">
-                    <h3>Réservations</h3>
-                    <p>Consulter et annuler les réservations</p>
-                    <a href="${pageContext.request.contextPath}/WEB-INF/views/back/reservations.jsp" class="btn btn-secondary">Voir les réservations</a>
-                </div>
-                
+
                 <div class="interface-card">
                     <h3>Promotions</h3>
                     <p>Créer des offres promotionnelles</p>

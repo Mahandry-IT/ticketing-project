@@ -7,7 +7,6 @@
             <li><a href="${pageContext.request.contextPath}/front/dashboard" class="active">Accueil</a></li>
             <li><a href="${pageContext.request.contextPath}/front/flights">Vols</a></li>
             <li><a href="${pageContext.request.contextPath}/front/reservations">Mes Réservations</a></li>
-            <li><a href="${pageContext.request.contextPath}/front/offer">Promotions</a></li>
             <li><a href="${pageContext.request.contextPath}/logout">Déconnexion</a></li>
         </ul>
     </div>

@@ -9,6 +9,7 @@ import mg.itu.ticketingproject.enums.ReservationStatus;
 import mg.itu.ticketingproject.util.JPAUtil;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -190,7 +191,7 @@ public class ReservationService {
                 detail.setPassengerName(passengerNames.get(i));
                 detail.setAge(ages.get(i));
                 detail.setPassport(passports.get(i));
-                detail.setPrice(getFinalSeatPrice(flightId, seatTypeIds.get(i), ages.get(i)).getPromotionPrice());
+                detail.setPrice(prices.get(i));
 
                 if (detail.getId() != null) {
                     detail = em.merge(detail);
@@ -313,6 +314,5 @@ public class ReservationService {
             em.close();
         }
     }
-
 
 }

@@ -142,7 +142,7 @@
       <div class="form-row">
         <div class="form-group">
           <label for="promotion">Promotion</label>
-          <input type="number" id="promotion" name="promotion" class="form-control" disabled>
+          <input type="number" id="promotion" name="promotion" class="form-control">
         </div>
         <div class="form-group">
           <label for="price">Prix</label>
