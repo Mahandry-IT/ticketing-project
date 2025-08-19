@@ -5,6 +5,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
   List<Reservation> reservations = (List<Reservation>) request.getAttribute("reservations");
+  String error = (String) request.getAttribute("error");
 %>
 <!DOCTYPE html>
 <html lang="fr">
@@ -39,6 +40,11 @@
 
     <!-- Dernières réservations -->
     <div class="search-filters">
+      <% if(error != null && !error.isEmpty()) { %>
+        <div class="alert alert-danger mb-3">
+          <%= error %>
+        </div>
+      <% } %>
       <h3>Vos Dernières Réservations</h3>
       <div class="table-container">
         <table class="table">

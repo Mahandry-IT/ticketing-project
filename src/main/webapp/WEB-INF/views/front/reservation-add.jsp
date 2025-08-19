@@ -51,11 +51,6 @@
         <input type="datetime-local" id="arrival-time" class="form-control" value="<%= flight.getArrivalTime()%>" disabled>
       </div>
     </div>
-    <h3 class="form-title">Informations Global de Réservation</h3>
-    <div class="form-group">
-      <label for="display-unit-price">Total de la Réservation</label>
-      <input type="number" value="150000" id="display-unit-price" class="form-control" disabled>
-    </div>
   </div>
 
   <form id="reservation-form" method="post" action="${pageContext.request.contextPath}/front/reservation/add" enctype="multipart/form-data">

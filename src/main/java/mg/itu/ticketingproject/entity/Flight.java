@@ -43,6 +43,12 @@ public class Flight {
     @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlaneSeat> planeSeats = new ArrayList<>();
 
+    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Offer> offer = new ArrayList<>();
+
+    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reservation> reservation = new ArrayList<>();
+
     @OneToMany(mappedBy = "flight", fetch = FetchType.LAZY)
     private List<Offer> offers;
 

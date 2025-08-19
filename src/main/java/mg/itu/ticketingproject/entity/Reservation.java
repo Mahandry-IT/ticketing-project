@@ -48,6 +48,9 @@ public class Reservation {
     @JoinColumn(name = "id_flight", nullable = false)
     private Flight flight;
 
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservationDetail> reservation = new ArrayList<>();
+
     @OneToMany(mappedBy = "reservation")
     private List<ReservationDetail> reservationDetails = new ArrayList<>();
 }

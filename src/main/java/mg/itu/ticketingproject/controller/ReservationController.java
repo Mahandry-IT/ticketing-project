@@ -12,6 +12,7 @@ import mg.itu.ticketingproject.data.dto.PriceDTO;
 import mg.itu.ticketingproject.data.request.PriceRequest;
 import mg.itu.ticketingproject.data.request.ReservationRequest;
 import mg.itu.ticketingproject.entity.Flight;
+import mg.itu.ticketingproject.entity.Reservation;
 import mg.itu.ticketingproject.entity.ReservationParam;
 import mg.itu.ticketingproject.enums.ReservationStatus;
 import mg.itu.ticketingproject.service.*;
@@ -19,6 +20,7 @@ import mg.itu.ticketingproject.util.ClassUtil;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,7 @@ public class ReservationController {
     private static SeatTypeService seatTypeService = new SeatTypeService();
     private static FlightService flightService = new FlightService();
     private static ReservationService reservationService = new ReservationService();
+    private static ReservationParamService reservationParamService = new ReservationParamService();
     private MySession session;
 
     @Get
@@ -74,7 +77,17 @@ public class ReservationController {
     @Get
     @Url("/front/cancel/reservation")
     @Authenticated(roles = {2})
-    public String cancelReservation(@Parametre(name = "id") Integer id) {
+    public String cancelReservation(@Parametre(name = "id") Integer id, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Reservation reservation = reservationService.findById(id);
+        if (reservation.getReservationTime().isAfter(reservation.getFlight().getDepartureTime().minusHours(reservationParamService.getLast().getCancelTime()))) {
+            Integer iduser = (Integer) session.get("iduser");
+            if (iduser == null) {
+                throw new RuntimeException("Veuillez vous connecter pour acceder a cette page");
+            }
+            request.setAttribute("error", "Vous ne pouvez pas annuler cette reservation car le vol est imminent.");
+            request.setAttribute("reservations", reservationService.findUserReservationsByDetailStatus(iduser));
+            request.getRequestDispatcher("/WEB-INF/views/front/reservations.jsp").forward(request, response);
+        }
         reservationService.updateReservationStatus(id, ReservationStatus.CANCELED);
         return "redirect:/front/reservations";
     }
@@ -88,14 +101,6 @@ public class ReservationController {
         mv.addObject("seatTypes", seatTypeService.findAll());
         mv.setUrl("/WEB-INF/views/front/reservation-modify.jsp");
         return mv;
-    }
-
-    @Get
-    @Url("/back/cancel/reservation")
-    @Authenticated(roles = {1})
-    public String cancelReservationAdmin(@Parametre(name = "id") Integer id) {
-        reservationService.updateReservationStatus(id, ReservationStatus.CANCELED);
-        return "redirect:/back/reservations";
     }
 
     @Get

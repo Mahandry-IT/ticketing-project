@@ -7,7 +7,7 @@
             <li><a href="${pageContext.request.contextPath}/back/dashboard">Dashboard</a></li>
             <li><a href="${pageContext.request.contextPath}/back/flights">Gestion Vols</a></li>
             <li><a href="${pageContext.request.contextPath}/back/offers">Promotions</a></li>
-            <li><a href="${pageContext.request.contextPath}/WEB-INF/views/back/config.jsp" class="active">Configuration</a></li>
+            <li><a href="${pageContext.request.contextPath}/back/add/reservation-param" class="active">Configuration</a></li>
             <li><a href="${pageContext.request.contextPath}/logout">Déconnexion</a></li>
         </ul>
     </div>
