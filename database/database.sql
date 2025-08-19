@@ -1,4 +1,34 @@
 -- Improved database schema with role management
+TRUNCATE TABLE reservation_details CASCADE;
+TRUNCATE TABLE plane_seat CASCADE;
+TRUNCATE TABLE offer CASCADE;
+TRUNCATE TABLE reservation CASCADE;
+TRUNCATE TABLE flight CASCADE;
+TRUNCATE TABLE plane CASCADE;
+TRUNCATE TABLE model CASCADE;
+TRUNCATE TABLE age_offer CASCADE;
+TRUNCATE TABLE age_category CASCADE;
+TRUNCATE TABLE reservation_param CASCADE;
+TRUNCATE TABLE seat_type CASCADE;
+TRUNCATE TABLE appuser CASCADE;
+TRUNCATE TABLE role CASCADE;
+TRUNCATE TABLE city CASCADE;
+
+-- Réinitialiser toutes les séquences à 1
+ALTER SEQUENCE age_category_id_category_seq RESTART WITH 1;
+ALTER SEQUENCE age_offer_id_age_seq RESTART WITH 1;
+ALTER SEQUENCE appuser_id_user_seq RESTART WITH 1;
+ALTER SEQUENCE city_id_city_seq RESTART WITH 1;
+ALTER SEQUENCE flight_id_flight_seq RESTART WITH 1;
+ALTER SEQUENCE model_id_model_seq RESTART WITH 1;
+ALTER SEQUENCE offer_id_offer_seq RESTART WITH 1;
+ALTER SEQUENCE plane_id_plane_seq RESTART WITH 1;
+ALTER SEQUENCE plane_seat_id_price_seq RESTART WITH 1;
+ALTER SEQUENCE reservation_details_id_details_seq RESTART WITH 1;
+ALTER SEQUENCE reservation_id_reservation_seq RESTART WITH 1;
+ALTER SEQUENCE reservation_param_id_parameter_seq RESTART WITH 1;
+ALTER SEQUENCE role_id_role_seq RESTART WITH 1;
+ALTER SEQUENCE seat_type_id_type_seq RESTART WITH 1;
 
 -- Drop existing tables if they exist (in correct order)
 DROP TABLE IF EXISTS reservation_details CASCADE;
