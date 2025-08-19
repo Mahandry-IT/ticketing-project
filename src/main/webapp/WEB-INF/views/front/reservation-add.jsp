@@ -138,11 +138,16 @@
           <label for="age">Âge</label>
           <input type="number" id="age" name="age" class="form-control" required>
         </div>
+      </div>
+      <div class="form-row">
         <div class="form-group">
-          <label for="prix">Prix</label>
-          <input type="number" id="prix" name="prix" class="form-control" disabled>
+          <label for="promotion">Promotion</label>
+          <input type="number" id="promotion" name="promotion" class="form-control" disabled>
         </div>
-        <input type="hidden" id="price" name="price" class="form-control" required>
+        <div class="form-group">
+          <label for="price">Prix</label>
+          <input type="number" id="price" name="price" class="form-control">
+        </div>
       </div>
     `;
 
@@ -150,7 +155,7 @@
       const seatTypeSelect = div.querySelector("select[name='seat_type']");
       const ageInput = div.querySelector("input[name='age']");
       const priceInput = div.querySelector("input[name='price']");
-      const priceValue = div.querySelector("input[name='prix']");
+      const promotionValue = div.querySelector("input[name='promotion']");
 
       async function updatePrice() {
         const seatTypeId = parseInt(seatTypeSelect.value); // <-- force number
@@ -159,13 +164,15 @@
         if (seatTypeId && !isNaN(age)) {
           try {
             const price = await getSeatPrice(flightId, seatTypeId, age);
-            priceValue.value = price;
-            priceInput.value = price;
+            promotionValue.value = price.promotionPrice;
+            priceInput.value = price.price;
           } catch (err) {
             console.error(err);
+            promotionValue.value = 0;
             priceInput.value = 0;
           }
         } else {
+          promotionValue.value = 0;
           priceInput.value = 0;
         }
       }

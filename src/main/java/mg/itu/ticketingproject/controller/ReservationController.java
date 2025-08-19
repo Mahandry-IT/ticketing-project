@@ -8,6 +8,7 @@ import lombok.Setter;
 import mg.itu.annotation.*;
 import mg.itu.prom16.FileSave;
 import mg.itu.prom16.ModelAndView;
+import mg.itu.ticketingproject.data.dto.PriceDTO;
 import mg.itu.ticketingproject.data.request.PriceRequest;
 import mg.itu.ticketingproject.data.request.ReservationRequest;
 import mg.itu.ticketingproject.entity.Flight;
@@ -98,9 +99,8 @@ public class ReservationController {
     @Url("/front/price/flight")
     @RestAPI
     @Authenticated(roles = {2})
-    public double getPrice(@RequestBody PriceRequest request) {
-        BigDecimal value = reservationService.getFinalSeatPrice(request.getIdFlight(), request.getIdSeatType(), request.getAge());
-        return value != null ? value.doubleValue() : 0.0;
+    public PriceDTO getPrice(@RequestBody PriceRequest request) {
+        return reservationService.getFinalSeatPrice(request.getIdFlight(), request.getIdSeatType(), request.getAge());
     }
 
     @Post

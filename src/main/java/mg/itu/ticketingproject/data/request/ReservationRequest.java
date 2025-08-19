@@ -30,6 +30,6 @@ public class ReservationRequest {
     @FormParametre("detail_id")
     private List<Integer> detail_id;
     @NotNull
-    @FormParametre("price")
+    @FormParametre("promotion")
     private List<Double> price;
 }

@@ -2,6 +2,7 @@ package mg.itu.ticketingproject.service;
 
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
+import mg.itu.ticketingproject.data.dto.PriceDTO;
 import mg.itu.ticketingproject.data.dto.SeatAvailabilityDTO;
 import mg.itu.ticketingproject.entity.*;
 import mg.itu.ticketingproject.enums.ReservationStatus;
@@ -189,7 +190,7 @@ public class ReservationService {
                 detail.setPassengerName(passengerNames.get(i));
                 detail.setAge(ages.get(i));
                 detail.setPassport(passports.get(i));
-                detail.setPrice(getFinalSeatPrice(flightId, seatTypeIds.get(i), ages.get(i)));
+                detail.setPrice(getFinalSeatPrice(flightId, seatTypeIds.get(i), ages.get(i)).getPromotionPrice());
 
                 if (detail.getId() != null) {
                     detail = em.merge(detail);
@@ -264,11 +265,12 @@ public class ReservationService {
         }
     }
 
-    public BigDecimal getFinalSeatPrice(Integer flightId, Integer seatTypeId, int passengerAge) {
+    public PriceDTO getFinalSeatPrice(Integer flightId, Integer seatTypeId, int passengerAge) {
         em = JPAUtil.getEntityManager();
         try {
-            TypedQuery<BigDecimal> query = em.createQuery(
-                    "SELECT ps.price " +
+            TypedQuery<Object[]> query = em.createQuery(
+                    "SELECT ps.price, " +
+                            "       ps.price " +
                             "       * (CASE WHEN (" +
                             "            SELECT COUNT(rd2) " +
                             "            FROM ReservationDetail rd2 " +
@@ -287,15 +289,24 @@ public class ReservationService {
                             "    WHERE :passengerAge BETWEEN ac.minimal AND ac.maximal" +
                             ") " +
                             "WHERE ps.flight.id = :flightId AND ps.type.id = :seatTypeId",
-                    BigDecimal.class
+                    Object[].class
             );
-
 
             query.setParameter("flightId", flightId);
             query.setParameter("seatTypeId", seatTypeId);
             query.setParameter("passengerAge", passengerAge);
 
-            return query.getSingleResult();
+            List<Object[]> results = query.getResultList();
+            if (results.isEmpty()) {
+                return new PriceDTO(BigDecimal.ZERO, BigDecimal.ZERO); // ou null selon ton choix
+            }
+
+            Object[] result = results.get(0);
+            BigDecimal basePrice = (BigDecimal) result[0];
+            BigDecimal finalPrice = (BigDecimal) result[1];
+
+            return new PriceDTO(finalPrice, basePrice);
+
         } catch (NoResultException e) {
             return null;
         } finally {

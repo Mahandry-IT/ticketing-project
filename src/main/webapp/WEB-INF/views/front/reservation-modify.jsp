@@ -92,13 +92,16 @@
             <label>Âge</label>
             <input type="number" name="age" class="age form-control" value="<%= reservation.getReservationDetails().get(i).getAge() %>" required>
           </div>
-
-          <div class="form-group">
-            <label>Prix</label>
-            <input type="number" name="prix" class="prix form-control" value="<%= reservation.getReservationDetails().get(i).getPrice() %>" required>
-          </div>
-
-          <input type="hidden" name="price" class="price" value="<%= reservation.getReservationDetails().get(i).getPrice() %>">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="promotion">Promotion</label>
+          <input type="number" id="promotion" name="promotion" value="<%= reservation.getReservationDetails().get(i).getPrice() %>" class="form-control" disabled>
+        </div>
+        <div class="form-group">
+          <label for="price">Prix</label>
+          <input type="number" id="price" name="price" value="<%= reservation.getReservationDetails().get(i).getPrice() %>" class="form-control">
         </div>
       </div>
       <% } %>
@@ -123,23 +126,25 @@
     function attachEventsToPassenger(block) {
       const seatTypeSelect = block.querySelector(".seat-type");
       const ageInput = block.querySelector(".age");
-      const priceInput = block.querySelector(".price");
-      const priceValue = block.querySelector(".prix");
+      const priceInput = div.querySelector("input[name='price']");
+      const promotionValue = div.querySelector("input[name='promotion']");
 
       async function updatePrice() {
-        const seatTypeId = parseInt(seatTypeSelect.value);
+        const seatTypeId = parseInt(seatTypeSelect.value); // <-- force number
         const age = parseInt(ageInput.value);
 
         if (seatTypeId && !isNaN(age)) {
           try {
             const price = await getSeatPrice(flightId, seatTypeId, age);
-            priceValue.value = price;
-            priceInput.value = price;
+            promotionValue.value = price.promotionPrice;
+            priceInput.value = price.price;
           } catch (err) {
             console.error(err);
+            promotionValue.value = 0;
             priceInput.value = 0;
           }
         } else {
+          promotionValue.value = 0;
           priceInput.value = 0;
         }
       }
