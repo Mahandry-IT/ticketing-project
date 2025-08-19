@@ -16,8 +16,6 @@ public class ReservationDetailService {
     @PersistenceContext
     private EntityManager em;
 
-    private static final Set<String> ALLOWED_STATUS = Set.of("CONFIRMED", "CANCELED", "PENDING");
-
     /** CREATE unitaire — status par défaut = PENDING */
     @Transactional
     public ReservationDetail create(Integer reservationId,
@@ -25,16 +23,11 @@ public class ReservationDetailService {
                                     String passengerName,
                                     int age,
                                     String passport,
-                                    BigDecimal price,
-                                    String statusOrNull) {
+                                    BigDecimal price) {
         em = JPAUtil.getEntityManager();
         Objects.requireNonNull(price, "price requis");
         Objects.requireNonNull(passport, "passport requis");
 
-        String status = (statusOrNull == null) ? "PENDING" : statusOrNull;
-        if (!ALLOWED_STATUS.contains(status)) {
-            throw new IllegalArgumentException("Status invalide: " + status);
-        }
 
         Reservation reservation = em.find(Reservation.class, reservationId, LockModeType.NONE);
         if (reservation == null) throw new IllegalArgumentException("Reservation introuvable: " + reservationId);
@@ -61,7 +54,6 @@ public class ReservationDetailService {
         rd.setAge(age);
         rd.setPassport(passport);
         rd.setPrice(price);
-        rd.setStatus(status); // <= PENDING par défaut
 
         em.persist(rd);
         em.flush();
@@ -133,11 +125,8 @@ public class ReservationDetailService {
     }
 
     /** READ — seulement les détails avec un status donné ET sur des vols futurs */
-    public List<ReservationDetail> findAllFutureByStatus(String status, int page, int size) {
+    public List<ReservationDetail> findAllFutureByStatus(int page, int size) {
         em = JPAUtil.getEntityManager();
-        if (!ALLOWED_STATUS.contains(status)) {
-            throw new IllegalArgumentException("Status invalide: " + status);
-        }
         LocalDateTime now = LocalDateTime.now();
 
         return em.createQuery("""
@@ -146,11 +135,9 @@ public class ReservationDetailService {
                 JOIN FETCH rd.reservation r
                 JOIN FETCH r.flight f
                 JOIN FETCH rd.seatType st
-                WHERE rd.status = :status
-                  AND f.departureTime > :now
+                WHERE f.departureTime > :now
                 ORDER BY f.departureTime, rd.id
                 """, ReservationDetail.class)
-                .setParameter("status", status)
                 .setParameter("now", now)
                 .setFirstResult(Math.max(0, page) * Math.max(1, size))
                 .setMaxResults(Math.max(1, size))
@@ -165,11 +152,8 @@ public class ReservationDetailService {
         if (rd != null) em.remove(rd);
     }
 
-    public List<ReservationDetail> findAllFutureByStatus(String status){
+    public List<ReservationDetail> findAllFutureByStatusAndReservation(Integer reservationId) {
         em = JPAUtil.getEntityManager();
-        if (!ALLOWED_STATUS.contains(status)) {
-            throw new IllegalArgumentException("Status invalide: " + status);
-        }
         LocalDateTime now = LocalDateTime.now();
 
         return em.createQuery("""
@@ -178,34 +162,10 @@ public class ReservationDetailService {
             JOIN FETCH rd.reservation r
             JOIN FETCH r.flight f
             JOIN FETCH rd.seatType st
-            WHERE rd.status = :status
-              AND f.departureTime > :now
-            ORDER BY f.departureTime, rd.id
-            """, ReservationDetail.class)
-                .setParameter("status", status)
-                .setParameter("now", now)
-                .getResultList();
-    }
-
-    public List<ReservationDetail> findAllFutureByStatusAndReservation(String status, Integer reservationId) {
-        em = JPAUtil.getEntityManager();
-        if (!ALLOWED_STATUS.contains(status)) {
-            throw new IllegalArgumentException("Status invalide: " + status);
-        }
-        LocalDateTime now = LocalDateTime.now();
-
-        return em.createQuery("""
-            SELECT rd
-            FROM ReservationDetail rd
-            JOIN FETCH rd.reservation r
-            JOIN FETCH r.flight f
-            JOIN FETCH rd.seatType st
-            WHERE rd.status = :status
-              AND f.departureTime > :now
+            WHERE f.departureTime > :now
                 AND r.id = :reservationId
             ORDER BY f.departureTime, rd.id
             """, ReservationDetail.class)
-                .setParameter("status", status)
                 .setParameter("now", now)
                 .setParameter("reservationId", reservationId)
                 .getResultList();
@@ -217,8 +177,7 @@ public class ReservationDetailService {
                                     String passengerName,      // nullable -> pas de changement
                                     Integer age,               // nullable -> pas de changement
                                     String passport,           // nullable -> pas de changement
-                                    BigDecimal price,          // nullable -> pas de changement (sauf CANCELED)
-                                    String statusOrNull) {     // nullable -> pas de changement
+                                    BigDecimal price) {     // nullable -> pas de changement
         em = JPAUtil.getEntityManager();
         ReservationDetail rd = em.find(ReservationDetail.class, detailId, LockModeType.PESSIMISTIC_WRITE);
         if (rd == null) throw new IllegalArgumentException("ReservationDetail introuvable: " + detailId);
@@ -234,41 +193,12 @@ public class ReservationDetailService {
         if (passport != null) rd.setPassport(passport);
         if (price != null) rd.setPrice(price);
 
-        // statut : si CANCELED => price = 0 (toujours)
-        if (statusOrNull != null) {
-            if (!ALLOWED_STATUS.contains(statusOrNull)) {
-                throw new IllegalArgumentException("Status invalide: " + statusOrNull);
-            }
-            rd.setStatus(statusOrNull);
-            if ("CANCELED".equals(statusOrNull)) {
-                rd.setPrice(BigDecimal.ZERO);
-            }
-        }
 
         em.flush();
 
         // Recalculer la réservation mère (total + passengerCount)
         recomputeReservationAggregates(rd.getReservation().getId());
 
-        return rd;
-    }
-
-    /* ---- Variante utilitaire : changer juste le statut ---- */
-    @Transactional
-    public ReservationDetail changeStatus(Integer detailId, String status) {
-        em = JPAUtil.getEntityManager();
-        if (!ALLOWED_STATUS.contains(status)) {
-            throw new IllegalArgumentException("Status invalide: " + status);
-        }
-        ReservationDetail rd = em.find(ReservationDetail.class, detailId, LockModeType.PESSIMISTIC_WRITE);
-        if (rd == null) throw new IllegalArgumentException("ReservationDetail introuvable: " + detailId);
-
-        rd.setStatus(status);
-        if ("CANCELED".equals(status)) {
-            rd.setPrice(BigDecimal.ZERO);
-        }
-        em.flush();
-        recomputeReservationAggregates(rd.getReservation().getId());
         return rd;
     }
 

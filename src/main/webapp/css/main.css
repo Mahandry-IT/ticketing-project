@@ -494,6 +494,25 @@ body {
     border-top: 1px solid var(--border-color);
 }
 
+.reservation-layout {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+.left-column, .right-column {
+    flex: 1;
+}
+.right-column {
+    max-width: 400px; /* colonne vol + infos plus compacte */
+}
+.form-container {
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
 @media (max-width: 768px) {
     .error-container {
         margin: 1rem;

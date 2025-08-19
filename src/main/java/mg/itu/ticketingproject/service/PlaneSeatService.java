@@ -1,6 +1,7 @@
 package mg.itu.ticketingproject.service;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import mg.itu.ticketingproject.data.dto.SeatAvailabilityDTO;
@@ -9,7 +10,6 @@ import mg.itu.ticketingproject.entity.*;
 import mg.itu.ticketingproject.util.JPAUtil;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class PlaneSeatService {
         em = JPAUtil.getEntityManager();
         try {
             return em.createQuery(
-                            "SELECT p FROM PlaneSeat p JOIN FETCH p.flight JOIN FETCH p.type WHERE p.flight.id = :id",
+                            "SELECT p FROM PlaneSeat p JOIN FETCH p.flight JOIN FETCH p.type WHERE p.flight.id = :id ORDER BY p.id",
                             PlaneSeat.class)
                     .setParameter("id", id)
                     .getResultList();
@@ -140,8 +140,7 @@ public class PlaneSeatService {
                             "SELECT COUNT(rd) " +
                                     "FROM ReservationDetail rd " +
                                     "WHERE rd.reservation.flight.id = :flightId " +
-                                    "AND rd.seatType.id = :seatTypeId " +
-                                    "AND rd.status != 'CANCELED'", Long.class)
+                                    "AND rd.seatType.id = :seatTypeId ", Long.class)
                     .setParameter("flightId", flightId)
                     .setParameter("seatTypeId", seatTypeId)
                     .getSingleResult();

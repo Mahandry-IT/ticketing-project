@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import mg.itu.ticketingproject.data.dto.SeatAvailabilityDTO;
 import mg.itu.ticketingproject.entity.*;
+import mg.itu.ticketingproject.enums.ReservationStatus;
 import mg.itu.ticketingproject.util.JPAUtil;
 
 import java.math.BigDecimal;
@@ -81,6 +82,7 @@ public class ReservationService {
                 SELECT r FROM Reservation r
                 JOIN FETCH r.user
                 JOIN FETCH r.flight
+                JOIN FETCH r.reservationDetails
                 WHERE r.id = :id
                 """, Reservation.class)
                 .setParameter("id", id)
@@ -88,11 +90,13 @@ public class ReservationService {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    public Reservation create(Integer userId,
+    public Reservation save(Integer userId,
                               Integer flightId,
+                              Integer reservationIds,
                               LocalDateTime reservationTime,
                               List<Integer> seatTypeIds,
                               List<String> passengerNames,
+                              List<Integer> detailIds,
                               List<Integer> ages,
                               List<String> passports,
                               List<BigDecimal> prices) throws Exception {
@@ -102,6 +106,15 @@ public class ReservationService {
 
         try {
             tx.begin();
+            Reservation myReservation = null;
+
+            if (reservationIds != null && passports.isEmpty()) {
+                myReservation = em.find(Reservation.class, reservationIds);
+                passports = myReservation.getReservationDetails().stream()
+                        .map(ReservationDetail::getPassport)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+            }
 
             Appuser user = em.find(Appuser.class, userId);
             if (user == null) {
@@ -120,7 +133,7 @@ public class ReservationService {
                 param.setCancelTime(0);
                 param.setReservationTime(0);
             }
-            if (reservationTime.isBefore(flight.getDepartureTime().minusHours(param.getReservationTime()))) {
+            if (reservationTime.isAfter(flight.getDepartureTime().minusHours(param.getReservationTime()))) {
                 throw new IllegalStateException("Réservation impossible : délai dépassé");
             }
 
@@ -143,15 +156,25 @@ public class ReservationService {
 
 
             Reservation reservation = new Reservation();
+            reservation.setId(reservationIds);
             reservation.setUser(user);
             reservation.setFlight(flight);
             reservation.setReservationTime(reservationTime);
             reservation.setTotalPrice(prices.stream()
                     .reduce(BigDecimal.ZERO, BigDecimal::add));
+            reservation.setPassengerCount(passengerNames.size());
+            reservation.setStatus(ReservationStatus.PENDING.getStatus());
 
-            em.persist(reservation);
-
-
+            if (reservation.getId() != null) {
+                if (myReservation != null){
+                    if (!myReservation.getStatus().equals(ReservationStatus.PENDING.getStatus())) {
+                        throw new IllegalStateException("Impossible de modifier une réservation qui n'est pas en attente");
+                    }
+                }
+                reservation = em.merge(reservation);
+            } else {
+                em.persist(reservation);
+            }
 
             for (int i = 0; i < passengerNames.size(); i++) {
                 SeatType seatType = em.find(SeatType.class, seatTypeIds.get(i));
@@ -159,15 +182,21 @@ public class ReservationService {
 //                BigDecimal price = planeSeatService.findByIdFlight(flightId).get(seatTypeIds.get(i)).getPrice();
 
                 ReservationDetail detail = new ReservationDetail();
+
+                detail.setId(detailIds != null && i < detailIds.size() ? detailIds.get(i) : null);
                 detail.setReservation(reservation);
                 detail.setSeatType(seatType);
                 detail.setPassengerName(passengerNames.get(i));
                 detail.setAge(ages.get(i));
                 detail.setPassport(passports.get(i));
-                detail.setPrice(prices.get(i));
-                detail.setStatus("PENDING");
+                detail.setPrice(getFinalSeatPrice(flightId, seatTypeIds.get(i), ages.get(i)));
 
-                em.persist(detail);
+                if (detail.getId() != null) {
+                    detail = em.merge(detail);
+                }
+                else {
+                    em.persist(detail);
+                }
             }
 
             tx.commit();
@@ -186,31 +215,93 @@ public class ReservationService {
      * Si onlyFuture = true, on ne garde que les réservations dont le vol n’est pas encore parti.
      * Résultat DISTINCT pour éviter les doublons (plusieurs détails par réservation).
      */
-    public List<Reservation> findUserReservationsByDetailStatus(Integer userId,
-                                                                String status,
-                                                                boolean onlyFuture) {
+    public List<Reservation> findUserReservationsByDetailStatus(Integer userId) {
         em = JPAUtil.getEntityManager();
-        String base = """
-            SELECT DISTINCT r
-            FROM ReservationDetail rd
-            JOIN rd.reservation r
-            JOIN FETCH r.user u
-            JOIN FETCH r.flight f
-            WHERE u.id = :uid
-              AND rd.status = :status
+        String jpql = """
+        SELECT r
+        FROM ReservationDetail rd
+        JOIN rd.reservation r
+        JOIN FETCH r.user u
+        JOIN FETCH r.flight f
+        WHERE u.id = :uid
+        ORDER BY f.departureTime, r.id
+    """;
+
+        TypedQuery<Reservation> q = em.createQuery(jpql, Reservation.class)
+                .setParameter("uid", userId);
+
+        // Chargement en mémoire + suppression des doublons côté Java
+        return q.getResultList().stream().distinct().toList();
+    }
+
+    public void updateReservationStatus(Integer reservationId, ReservationStatus status) {
+        EntityManager em = JPAUtil.getEntityManager();
+        EntityTransaction tx = null;
+
+        try {
+            tx = em.getTransaction();
+            tx.begin();
+
+            String jpql = """
+            UPDATE Reservation r
+            SET r.status = :status
+            WHERE r.id = :id
         """;
 
-        String withFuture = base + " AND f.departureTime > :now ORDER BY f.departureTime, r.id";
-        String withoutFuture = base + " ORDER BY f.departureTime, r.id";
+            em.createQuery(jpql)
+                    .setParameter("status", status.getStatus())
+                    .setParameter("id", reservationId)
+                    .executeUpdate();
 
-        TypedQuery<Reservation> q = em.createQuery(onlyFuture ? withFuture : withoutFuture, Reservation.class)
-                .setParameter("uid", userId)
-                .setParameter("status", status);
-
-        if (onlyFuture) {
-            q.setParameter("now", LocalDateTime.now());
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
         }
-
-        return q.getResultList();
     }
+
+    public BigDecimal getFinalSeatPrice(Integer flightId, Integer seatTypeId, int passengerAge) {
+        em = JPAUtil.getEntityManager();
+        try {
+            TypedQuery<BigDecimal> query = em.createQuery(
+                    "SELECT ps.price " +
+                            "       * (CASE WHEN (" +
+                            "            SELECT COUNT(rd2) " +
+                            "            FROM ReservationDetail rd2 " +
+                            "            WHERE rd2.seatType = ps.type " +
+                            "            AND rd2.reservation.flight.id = ps.flight.id " +
+                            "            AND rd2.reservation.status <> 'CANCELED' " +
+                            "         ) < COALESCE(o.number, 0) " +
+                            "         THEN (1 - COALESCE(o.offer, 0)/100) " +
+                            "         ELSE 1 " +
+                            "       END) " +
+                            "       * (1 - COALESCE(ao.offer, 0)/100) " +
+                            "FROM PlaneSeat ps " +
+                            "LEFT JOIN Offer o ON o.type = ps.type AND o.flight.id = ps.flight.id " +
+                            "LEFT JOIN AgeOffer ao ON ao.category.id = (" +
+                            "    SELECT ac.id FROM AgeCategory ac " +
+                            "    WHERE :passengerAge BETWEEN ac.minimal AND ac.maximal" +
+                            ") " +
+                            "WHERE ps.flight.id = :flightId AND ps.type.id = :seatTypeId",
+                    BigDecimal.class
+            );
+
+
+            query.setParameter("flightId", flightId);
+            query.setParameter("seatTypeId", seatTypeId);
+            query.setParameter("passengerAge", passengerAge);
+
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+
 }

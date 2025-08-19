@@ -209,13 +209,7 @@ INSERT INTO plane (name, manufacturing_date, id_model) VALUES
 ('JetStream 737', '2015-07-11', 1), -- Boeing 737-800
 ('NovaAir A320', '2021-03-22', 2);  -- Airbus A320
 
--- Supprimer la colonne status de reservation
-ALTER TABLE reservation DROP COLUMN status;
-
--- Ajouter la colonne status dans reservation_details
-ALTER TABLE reservation_details ADD COLUMN status VARCHAR(50) NOT NULL DEFAULT 'PENDING';
-
 -- Ajouter la contrainte de vérification sur la nouvelle colonne
-ALTER TABLE reservation_details
-    ADD CONSTRAINT chk_status_details
+ALTER TABLE reservation
+    ADD CONSTRAINT chk_status
         CHECK (status IN ('CONFIRMED', 'CANCELED', 'PENDING'));

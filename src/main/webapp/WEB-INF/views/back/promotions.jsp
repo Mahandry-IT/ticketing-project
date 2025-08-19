@@ -71,13 +71,13 @@
                         <div class="form-group">
                             <label for="number_seats">Nombre de sièges en promotion *</label>
                             <input type="number" id="number_seats" name="number_seats" 
-                                   class="form-control" min="1" required>
+                                   class="form-control" min="0" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="discount">Pourcentage de réduction (%) *</label>
                             <input type="number" id="discount" name="discount" 
-                                   class="form-control" min="1" max="100" step="0.01" required>
+                                   class="form-control" min="0" max="100" step="0.01" required>
                         </div>
                     </div>
                     <div class="form-group">

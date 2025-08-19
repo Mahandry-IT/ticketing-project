@@ -33,6 +33,11 @@ public class Reservation {
     @Column(name = "passenger_count", nullable = false)
     private Integer passengerCount;
 
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "status", nullable = false, length = 50)
+    private String status;
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_user", nullable = false)

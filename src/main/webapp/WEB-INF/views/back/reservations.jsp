@@ -47,7 +47,7 @@
                         <select id="status_filter" name="status_filter" class="form-control">
                             <option value="">Tous les statuts</option>
                             <option value="CONFIRMED">Confirmée</option>
-                            <option value="CANCELLED">Annulée</option>
+                            <option value="CANCELED">Annulée</option>
                             <option value="PENDING">En attente</option>
                         </select>
                     </div>

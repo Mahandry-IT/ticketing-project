@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 public class SeatAvailabilityDTO {
     private String seatType;
     private BigDecimal price;
-    private Integer totalSeats;
+    private int totalSeats;
     private Long availableSeats;
 
     public SeatAvailabilityDTO(String seatType, BigDecimal price, Integer totalSeats, Long availableSeats) {

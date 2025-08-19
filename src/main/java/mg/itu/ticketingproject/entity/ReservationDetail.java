@@ -42,10 +42,4 @@ public class ReservationDetail {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_type", nullable = false)
     private SeatType seatType;
-
-    @Size(max = 50)
-    @NotNull
-    @Column(name = "status", nullable = false, length = 50)
-    private String status;
-
 }
