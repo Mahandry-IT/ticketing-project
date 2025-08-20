@@ -53,6 +53,7 @@
             <th>Réservation</th>
             <th>Vol</th>
             <th>Date</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
           </thead>
@@ -62,6 +63,15 @@
                 <td><%= reservation.getId() %></td>
                 <td><%= reservation.getFlight().getDepartureCity().getName() + " → " + reservation.getFlight().getArrivalCity().getName() %></td>
                 <td><%= FrontUtil.formaterDateTime(reservation.getReservationTime(), "dd MMM yyyy HH:mm:ss") %></td>
+                <td>
+                  <% if (reservation.getStatus().equalsIgnoreCase(ReservationStatus.CANCELED.getStatus())) {%>
+                    <span class="alert alert-danger" style="padding: 0.25rem 0.5rem; margin: 0;"><%= FrontUtil.uniformalizedLetter(reservation.getStatus())%></span>
+                  <% } else if (reservation.getStatus().equalsIgnoreCase(ReservationStatus.PENDING.getStatus())) {  %>
+                    <span class="alert alert-warning" style="padding: 0.25rem 0.5rem; margin: 0;"><%= FrontUtil.uniformalizedLetter(reservation.getStatus())%></span>
+                  <% } else { %>
+                    <span class="alert alert-success" style="padding: 0.25rem 0.5rem; margin: 0;"><%= FrontUtil.uniformalizedLetter(reservation.getStatus())%></span>
+                  <% } %>
+                </td>
                 <td class="actions">
                   <a href="${pageContext.request.contextPath}/front/detail/reservation?id=<%= reservation.getId()%>" class="btn btn-secondary">Détails</a>
                   <% if (reservation.getStatus().equals(ReservationStatus.PENDING.getStatus())) {%>
