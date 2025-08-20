@@ -5,6 +5,7 @@
         <a href="${pageContext.request.contextPath}/back/dashboard" class="nav-brand">Backoffice</a>
         <ul class="nav-menu">
             <li><a href="${pageContext.request.contextPath}/back/dashboard">Dashboard</a></li>
+            <li><a href="${pageContext.request.contextPath}/back/alea">Alea</a></li>
             <li><a href="${pageContext.request.contextPath}/back/flights">Gestion Vols</a></li>
             <li><a href="${pageContext.request.contextPath}/back/offers">Promotions</a></li>
             <li><a href="${pageContext.request.contextPath}/back/add/reservation-param" class="active">Configuration</a></li>

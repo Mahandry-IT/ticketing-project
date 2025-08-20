@@ -107,7 +107,7 @@ public class ReservationController {
     @Url("/back/confirm/reservation")
     @Authenticated(roles = {1})
     public String confimReservationAdmin(@Parametre(name = "id") Integer id) {
-        reservationService.updateReservationStatus(id, ReservationStatus.CONFIRMED);
+        reservationService.updateReservationStatus(id, ReservationStatus.PAID);
         return "redirect:/back/reservations";
     }
 

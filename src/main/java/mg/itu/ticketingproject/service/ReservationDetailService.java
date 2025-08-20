@@ -16,7 +16,7 @@ public class ReservationDetailService {
     @PersistenceContext
     private EntityManager em;
 
-    /** CREATE unitaire — status par défaut = PENDING */
+    /** CREATE unitaire — status par défaut = NOT_PAID */
     @Transactional
     public ReservationDetail create(Integer reservationId,
                                     Integer seatTypeId,

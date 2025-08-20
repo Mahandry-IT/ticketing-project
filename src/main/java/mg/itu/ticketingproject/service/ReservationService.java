@@ -10,7 +10,9 @@ import mg.itu.ticketingproject.util.JPAUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Date;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -165,11 +167,11 @@ public class ReservationService {
             reservation.setTotalPrice(prices.stream()
                     .reduce(BigDecimal.ZERO, BigDecimal::add));
             reservation.setPassengerCount(passengerNames.size());
-            reservation.setStatus(ReservationStatus.PENDING.getStatus());
+            reservation.setStatus(ReservationStatus.NOT_PAID.getStatus());
 
             if (reservation.getId() != null) {
                 if (myReservation != null){
-                    if (!myReservation.getStatus().equals(ReservationStatus.PENDING.getStatus())) {
+                    if (!myReservation.getStatus().equals(ReservationStatus.NOT_PAID.getStatus())) {
                         throw new IllegalStateException("Impossible de modifier une réservation qui n'est pas en attente");
                     }
                 }
@@ -310,6 +312,34 @@ public class ReservationService {
 
         } catch (NoResultException e) {
             return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    public void cancelReservation(Date date) {
+        em = JPAUtil.getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            LocalDateTime dateLDT = date.toLocalDate().atStartOfDay();
+            tx.begin();
+            String jpql = """
+                UPDATE Reservation r
+                SET r.status = :status
+                WHERE r.reservationTime <= :date
+                AND r.status <> 'PAID'
+                AND r.status <> 'CANCELED'
+            """;
+            em.createQuery(jpql)
+                    .setParameter("date", dateLDT)
+                    .setParameter("status", ReservationStatus.CANCELED.getStatus())
+                    .executeUpdate();
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            throw e;
         } finally {
             em.close();
         }

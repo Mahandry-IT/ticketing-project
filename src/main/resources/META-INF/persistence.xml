@@ -23,6 +23,7 @@
     <class>mg.itu.ticketingproject.entity.ReservationParam</class>
     <class>mg.itu.ticketingproject.entity.Role</class>
     <class>mg.itu.ticketingproject.entity.SeatType</class>
+    <class>mg.itu.ticketingproject.entity.PromotionAlea</class>
 
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
 

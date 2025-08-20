@@ -66,7 +66,7 @@
                 <td>
                   <% if (reservation.getStatus().equalsIgnoreCase(ReservationStatus.CANCELED.getStatus())) {%>
                     <span class="alert alert-danger" style="padding: 0.25rem 0.5rem; margin: 0;"><%= FrontUtil.uniformalizedLetter(reservation.getStatus())%></span>
-                  <% } else if (reservation.getStatus().equalsIgnoreCase(ReservationStatus.PENDING.getStatus())) {  %>
+                  <% } else if (reservation.getStatus().equalsIgnoreCase(ReservationStatus.NOT_PAID.getStatus())) {  %>
                     <span class="alert alert-warning" style="padding: 0.25rem 0.5rem; margin: 0;"><%= FrontUtil.uniformalizedLetter(reservation.getStatus())%></span>
                   <% } else { %>
                     <span class="alert alert-success" style="padding: 0.25rem 0.5rem; margin: 0;"><%= FrontUtil.uniformalizedLetter(reservation.getStatus())%></span>
@@ -74,7 +74,7 @@
                 </td>
                 <td class="actions">
                   <a href="${pageContext.request.contextPath}/front/detail/reservation?id=<%= reservation.getId()%>" class="btn btn-secondary">Détails</a>
-                  <% if (reservation.getStatus().equals(ReservationStatus.PENDING.getStatus())) {%>
+                  <% if (reservation.getStatus().equals(ReservationStatus.NOT_PAID.getStatus())) {%>
                     <a href="${pageContext.request.contextPath}/front/modify/reservation?id=<%= reservation.getId()%>" class="btn btn-warning">Modifer</a>
                     <a href="${pageContext.request.contextPath}/front/cancel/reservation?id=<%= reservation.getId()%>" class="btn btn-danger">Annuler</a>
                   <% } %>
