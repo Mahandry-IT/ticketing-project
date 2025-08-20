@@ -16,7 +16,7 @@
 
         <div class="container">
 
-            <form action="${pageContext.request.contextPath}/back/alea" method="post" style="max-width: 800px" class="form-container">
+            <form action="${pageContext.request.contextPath}/back/alea/date" method="get" style="max-width: 800px" class="form-container">
                 <label for="date">Date :</label>
                 <input type="date" id="date" name="date" class="form-control">
                 <button type="submit" class="btn btn-primary mt-2">Rechercher</button>

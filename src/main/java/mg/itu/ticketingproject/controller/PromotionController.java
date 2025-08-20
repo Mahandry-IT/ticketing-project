@@ -39,8 +39,8 @@ public class PromotionController {
         return mv;
     }
 
-    @Post
-    @Url("/back/alea")
+    @Get
+    @Url("/back/alea/date")
     @Authenticated(roles = {1})
     public ModelAndView traitementDate(@Parametre(name = "date") Date date) {
         mv = new ModelAndView();
